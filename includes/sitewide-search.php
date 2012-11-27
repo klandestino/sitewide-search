@@ -47,13 +47,15 @@ class Sitewide_Search {
 	}
 
 	/**
-	 * Settings
+	 * Settings stored locally
+	 */
+	public $settings = array();
 
 	/**
 	 * Constructor
 	 */
 	function __construct() {
-		//
+		$this->settings = Sitewide_Search_Admin::get_settings();
 	}
 
 	/**
@@ -63,7 +65,39 @@ class Sitewide_Search {
 	 * @return void
 	 */
 	public function add_actions_and_filters() {
-		//
+		// If there's no archive blog set, then there's no blog to save posts to
+		if( $this->settings[ 'archive_blog_id' ] ) {
+			// Handle post saving
+			add_action( 'save_post', array( $this, 'save_post', 10, 2 ) );
+			// Handle post trashing and deleting
+			add_action( 'trash_post', array( $this, 'delete_post' ) );
+			add_action( 'delete_post', array( $this, 'delete_post' ) );
+			// Handle blog removal
+			add_action( 'delete_blog', array( $this, 'delete_all_posts_by_blog' ) );
+			add_action( 'archive_blog', array( $this, 'delete_all_posts_by_blog' ) );
+			add_action( 'deactivate_blog', array( $this, 'delete_all_posts_by_blog' ) );
+			add_action( 'make_spam_blog', array( $this, 'delete_all_posts_by_blog' ) );
+			add_action( 'mature_blog', array( $this, 'delete_all_posts_by_blog' ) );
+			add_action( 'transition_post_status', array( $this, 'delete_all_posts_by_blog' ) );
+		}
+	}
+
+	/**
+	 * Saves a post to archive blog
+	 */
+	public function save_post( $post_id, $post ) {
+	}
+
+	/**
+	 * Deletes a post from the archive blog
+	 */
+	public function delete_post( $post_id ) {
+	}
+
+	/**
+	 * Delete all posts by blog from archive blog
+	 */
+	public function delete_all_posts_by_blog( $blog_id ) {
 	}
 
 }
