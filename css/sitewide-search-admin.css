@@ -1,0 +1,20 @@
+#blog-result label {
+	display: inline;
+}
+
+#blog-result .blog-template {
+	display: none;
+}
+
+input#blog-search.working {
+	color: gray;
+	background: url('../../../../wp-admin/images/loading-publish.gif') right center no-repeat;
+}
+
+.sitewide-search-admin td {
+	vertical-align: top;
+}
+
+.sitewide-search-admin th label {
+	font-weight: bold;
+}

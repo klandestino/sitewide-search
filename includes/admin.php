@@ -23,6 +23,10 @@ class Sitewide_Search_Admin {
 		add_action( 'init', array( Sitewide_Search_Admin, 'init' ) );
 		// Fetch all post-types with registered_post_type to use in admin settings page
 		add_action( 'registered_post_type', array( Sitewide_Search_Admin, 'add_post_type' ), 10, 2 );
+		// Add scripts and styles
+		add_action( 'admin_enqueue_scripts', array( Sitewide_Search_Admin, 'enqueue_scripts' ) );
+		// Hook the get_blogs ajax request
+		add_action( 'wp_ajax_get_blogs', array( Sitewide_Search_Admin, 'get_blogs' ) );
 	}
 
 	/**
@@ -44,7 +48,7 @@ class Sitewide_Search_Admin {
 	 * @return array
 	 */
 	static public function get_settings() {
-		$settings = get_site_options( 'sitewide_search_settings', array() );
+		$settings = get_site_option( 'sitewide_search_settings', array() );
 		$defaults = array(
 			'enabled' => false,
 			'archive_blog_id' => 0,
@@ -70,6 +74,17 @@ class Sitewide_Search_Admin {
 	 */
 	public static function add_post_type( $name, $post_type ) {
 		self::$post_types[ $name ] = $post_type->labels->name;
+	}
+
+	/**
+	 * Makes wordpress load scripts and styles
+	 * @uses wp_enqueue_script
+	 * @uses wp_enqueue_style
+	 * @return void
+	 */
+	static public function enqueue_scripts() {
+		wp_enqueue_script( 'sitewide-search-admin', SITEWIDE_SEARCH_PLUGIN_URL . '/js/sitewide-search-admin.js', array( 'jquery' ) );
+		wp_enqueue_style( 'sitewide-search-admin', SITEWIDE_SEARCH_PLUGIN_URL . '/css/sitewide-search-admin.css' );
 	}
 
 	/**
@@ -120,6 +135,67 @@ class Sitewide_Search_Admin {
 				'echo "<div class=\"updated\"><p>%s</p></div>";',
 				__( 'Settings updated.', 'sitewide-search' )
 			) ) );
+		}
+	}
+
+	/**
+	 * Searches for blogs by name
+	 * @uses $wpdb->get_results
+	 * @uses $wpdb->set_blog_id
+	 * @param string|int|array $query optional, search string or int or array with blog id's. Using $_POST[ query ] if empty
+	 * @param boolean $print_json optional, if set to true, result will be printed as json and exit
+	 * @return array|void
+	 */
+	static public function get_blogs( $query = '', $print_json = true ) {
+		global $wpdb;
+		$blogs = array();
+		$current_blog_id = $wpdb->blogid;
+
+		if( empty( $query ) && array_key_exists( 'query', $_POST ) ) {
+			$query = $_POST[ 'query' ];
+		}
+
+		if( is_numeric( $query ) ) {
+			$query = array( $query );
+		}
+
+		if( is_array( $query ) ) {
+			$query = $wpdb->get_results( sprintf(
+				'SELECT `blog_id`, `domain` FROM `%s` WHERE `blog_id` IN ( %s )',
+				mysql_real_escape_string( $wpdb->blogs ),
+				mysql_real_escape_string( implode( ',', $query ) )
+			), ARRAY_A );
+		} elseif( ! empty( $query ) ) {
+			$query = $wpdb->get_results( sprintf(
+				'SELECT `blog_id`, `domain` FROM `%s` WHERE `domain` LIKE "%%%s%%"',
+				mysql_real_escape_string( $wpdb->blogs ),
+				mysql_real_escape_string( $query )
+			), ARRAY_A );
+		}
+
+		foreach( $query as $blog ) {
+			$wpdb->set_blog_id( $blog[ 'blog_id' ] );
+
+			$subquery = $wpdb->get_results( sprintf(
+				'SELECT `option_name`, `option_value` FROM `%s` WHERE `option_name` IN ( "siteurl", "blogname", "blogdescription" )',
+				mysql_real_escape_string( $wpdb->options )
+			), ARRAY_A );
+
+			foreach( $subquery as $opt ) {
+				$blog[ $opt[ 'option_name' ] ] = esc_attr( $opt[ 'option_value' ] );
+			}
+
+			$blogs[] = $blog;
+		}
+
+		$wpdb->set_blog_id( $current_blog_id );
+
+		if( $print_json ) {
+			echo json_encode( $blogs );
+			// Exit when done and before wordpress or something else prints a zero.
+			exit;
+		} else {
+			return $blogs;
 		}
 	}
 

@@ -21,6 +21,9 @@ define( 'SITEWIDE_SEARCH_PLUGIN_DIR', dirname( $network_plugin ) );
 // Used by Sitewide_Search::get_template
 define( 'SITEWIDE_SEARCH_TEMPLATE_DIR', dirname( __FILE__ ) . '/templates' );
 
+// Set a symlink friendly plugin dir url
+define( 'SITEWIDE_SEARCH_PLUGIN_URL', plugin_dir_url( '' ) . basename( SITEWIDE_SEARCH_PLUGIN_DIR ) );
+
 // Require the main class
 require_once( dirname( __FILE__ ) . '/includes/sitewide-search.php' );
 // Require the admin class
