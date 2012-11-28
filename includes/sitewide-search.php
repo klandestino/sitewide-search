@@ -76,6 +76,7 @@ class Sitewide_Search {
 			add_action( 'init', array( $this, 'register_post_type' ) );
 			// Handle post saving
 			add_action( 'save_post', array( $this, 'save_post' ), 10, 2 );
+			add_action( 'transition_post_status', array( $this, 'save_post', 10, 2 ) );
 			// Handle taxonomy inserts
 			add_action( 'set_object_terms', array( $this, 'save_taxonomy' ), 10, 4 );
 			// Handle post trashing and deleting
@@ -87,7 +88,7 @@ class Sitewide_Search {
 			add_action( 'deactivate_blog', array( $this, 'delete_all_posts_by_blog' ) );
 			add_action( 'make_spam_blog', array( $this, 'delete_all_posts_by_blog' ) );
 			add_action( 'mature_blog', array( $this, 'delete_all_posts_by_blog' ) );
-			add_action( 'transition_post_status', array( $this, 'delete_all_posts_by_blog' ) );
+			add_action( 'update_option_blog_public', array( $this, 'handle_blog_update' ) );
 		}
 	}
 
@@ -120,6 +121,8 @@ class Sitewide_Search {
 
 	/**
 	 * Saves a post to archive blog
+	 * @uses wp_update_post
+	 * @uses wp_inster_post
 	 * @param int $post_id
 	 * @param object $post optional, uses $_POST and $_GET as fallbacks
 	 * @return void
@@ -176,6 +179,7 @@ class Sitewide_Search {
 
 	/**
 	 * Saves taxonomies related to post
+	 * @uses wp_set_object_terms
 	 * @param int $post_id
 	 * @param array $terms
 	 * @param array $term_ids
@@ -186,7 +190,7 @@ class Sitewide_Search {
 		global $wpdb;
 		$current_blog_id = $wpdb->blogid;
 
-		if( $this->settings[ 'archive_blog_id' ] != $current_blog_id && get_blogaddress_by_id( $this->settings[ 'archive_blog_id' ] ) ) {
+		if( $this->settings[ 'archive_blog_id' ] != $current_blog_id ) {
 			$post = get_post( $post_id, OBJECT );
 
 			if( $post ) {
@@ -224,14 +228,76 @@ class Sitewide_Search {
 
 	/**
 	 * Deletes a post from the archive blog
+	 * @uses wp_delete_post
+	 * @param int $post_id
+	 * @return void
 	 */
 	public function delete_post( $post_id ) {
+		global $wpdb;
+		$current_blog_id = $wpdb->blogid;
+
+		if( $this->settings[ 'archive_blog_id' ] != $current_blog_id ) {
+			$wpdb->set_blog_id( $this->settings[ 'archive_blog_id' ] );
+
+			$copies = $wpdb->get_results( sprintf(
+				'SELECT `ID` FROM `%s` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
+				$wpdb->prepare( $wpdb->posts ),
+				$wpdb->prepare( $current_blog_id ),
+				$wpdb->prepare( $post_id )
+			), OBJECT );
+
+			if( $copies ) {
+				foreach( $copies as $copy ) {
+					wp_delete_post( $copy->ID );
+				}
+			}
+
+			$wpdb->set_blog_id( $current_blog_id );
+		}
+	}
+
+	/**
+	 * Check blog status and erase all posts if it's not public anymore
+	 * Run by update_option-action
+	 * @return void
+	 */
+	public function handle_blog_update() {
+		global $blog_id;
+
+		if( $this->settings[ 'archive_blog_id' ] != $blog_id ) {
+			if( ! get_blog_option( $blog_id, 'public' ) ) {
+				$this->delete_all_posts_by_blog( $blog_id );
+			}
+		}
 	}
 
 	/**
 	 * Delete all posts by blog from archive blog
+	 * @uses wp_delete_post
+	 * @param int $blog_id
+	 * $return void
 	 */
 	public function delete_all_posts_by_blog( $blog_id ) {
+		global $wpdb;
+		$current_blog_id = $wpdb->blogid;
+
+		if( $this->settings[ 'archive_blog_id' ] ) {
+			$wpdb->set_blog_id( $this->settings[ 'archive_blog_id' ] );
+
+			$copies = $wpdb->get_results( sprintf(
+				'SELECT `ID` FROM `%s` WHERE `guid` REGEXP "[^0-9]*%d,[0-9]+"',
+				$wpdb->prepare( $wpdb->posts ),
+				$wpdb->prepare( $blog_id )
+			), OBJECT );
+
+			if( $copies ) {
+				foreach( $copies as $copy ) {
+					wp_delete_post( $copy->ID );
+				}
+			}
+
+			$wpdb->set_blog_id( $current_blog_id );
+		}
 	}
 
 }
