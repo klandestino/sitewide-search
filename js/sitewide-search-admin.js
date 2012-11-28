@@ -83,6 +83,24 @@ jQuery( function( $ ) {
 		}
 	}
 
+	/**
+	 * Sending a reset action to wordpress and listens for status
+	 */
+	function resetArchive() {
+	}
+
+	/**
+	 * Sending a repopulate action to wordpress and listens for status
+	 */
+	function repopulateArchive() {
+	}
+
+	/**
+	 * Add event listeners
+	 */
+
 	$( '#blog-search' ).keydown( searchByTimeout );
+	$( '#sitewide-search-reset' ).click( resetArchive );
+	$( '#sitewide-search-repopulate' ).click( repopulateArchive );
 
 } );

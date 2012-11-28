@@ -68,7 +68,9 @@ class Sitewide_Search {
 		// If there's no archive blog set, then there's no blog to save posts to
 		if( $this->settings[ 'archive_blog_id' ] ) {
 			// Handle post saving
-			add_action( 'save_post', array( $this, 'save_post', 10, 2 ) );
+			add_action( 'save_post', array( $this, 'save_post' ), 10, 2 );
+			// Handle taxonomy inserts
+			add_action( 'set_object_terms', array( $this, 'save_taxonomy' ), 10, 4 );
 			// Handle post trashing and deleting
 			add_action( 'trash_post', array( $this, 'delete_post' ) );
 			add_action( 'delete_post', array( $this, 'delete_post' ) );
@@ -84,8 +86,65 @@ class Sitewide_Search {
 
 	/**
 	 * Saves a post to archive blog
+	 * @param int $post_id
+	 * @param object $post optional, uses $_POST and $_GET as fallbacks
+	 * @return void
 	 */
-	public function save_post( $post_id, $post ) {
+	public function save_post( $post_id, $post = null ) {
+		global $wpdb;
+		$current_blog_id = $wpdb->blogid;
+
+		if( $this->settings[ 'archive_blog_id' ] != $current_blog_id && get_blogaddress_by_id( $this->settings[ 'archive_blog_id' ] ) ) {
+			if( ! is_object( $post ) && array_key_exists( 'post_title', $_POST ) ) {
+				$post = ( object ) $_POST;
+			} elseif( ! is_object( $post ) && array_key_exists( 'post_title', $_GET ) ) {
+				$post = ( object ) $_GET;
+			}
+
+			if( property_exists( $post, 'post_type' ) && property_exists( $post, 'post_status' ) ) {
+				if(
+					in_array( $post->post_type, $this->settings[ 'post_type' ] )
+					&& $post->post_status == 'publish'
+				) {
+					$permalink = get_permalink( $post->ID );
+					$post->guid = sprintf( '%d,%d', $current_blog_id, $post->ID );
+					$post->ping_status = 'closed';
+					$post->comment_status = 'closed';
+					$copy = null;
+
+					$wpdb->set_blog_id( $this->settings[ 'archive_blog_id' ] );
+
+					if( property_exists( $post, 'ID' ) ) {
+						$copy = $wpdb->get_row( sprintf(
+							'SELECT `ID` FROM `%s` WHERE `guid` = "%d,%d"',
+							$wpdb->prepare( $wpdb->posts ),
+							$wpdb->prepare( $current_blog_id ),
+							$wpdb->prepare( $post->ID )
+						), OBJECT, 0 );
+					}
+
+					if( is_object( $copy ) ) {
+						$post->ID = $copy->ID;
+						wp_update_post( $post );
+					} else {
+						unset( $post->ID );
+						$copy = ( object ) array(
+							'ID' => wp_insert_post( $post )
+						);
+					}
+
+					update_post_meta( $copy->ID, 'permalink', $permalink );
+
+					$wpdb->set_blog_id( $current_blog_id );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Saves taxonomies related to post
+	 */
+	public function save_taxonomy( $post_id, $terms, $term_ids, $taxonomy ) {
 	}
 
 	/**

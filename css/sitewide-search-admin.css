@@ -18,3 +18,7 @@ input#blog-search.working {
 .sitewide-search-admin th label {
 	font-weight: bold;
 }
+
+.sitewide-search-utilites {
+	padding: 0 10px;
+}

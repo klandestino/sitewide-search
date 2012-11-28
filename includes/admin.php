@@ -14,6 +14,12 @@ class Sitewide_Search_Admin {
 	static public $post_types = array();
 
 	/**
+	 * Static array with supported taxonomies
+	 * Add by registered_taxonomy action
+	 */
+	static public $taxonomies = array();
+
+	/**
 	 * Static function that setups the admin interface
 	 * @uses add_action
 	 * @return void
@@ -23,6 +29,8 @@ class Sitewide_Search_Admin {
 		add_action( 'init', array( Sitewide_Search_Admin, 'init' ) );
 		// Fetch all post-types with registered_post_type to use in admin settings page
 		add_action( 'registered_post_type', array( Sitewide_Search_Admin, 'add_post_type' ), 10, 2 );
+		// Fetch all taxonomies with registered_taxonomy to use in admin settings page
+		add_action( 'registered_taxonomy', array( Sitewide_Search_Admin, 'add_taxonomy' ), 10, 3 );
 		// Add scripts and styles
 		add_action( 'admin_enqueue_scripts', array( Sitewide_Search_Admin, 'enqueue_scripts' ) );
 		// Hook the get_blogs ajax request
@@ -52,7 +60,8 @@ class Sitewide_Search_Admin {
 		$defaults = array(
 			'enabled' => false,
 			'archive_blog_id' => 0,
-			'post_types' => array()
+			'post_types' => array( 'post' ),
+			'taxonomies' => array( 'post_tag', 'category' )
 		);
 
 		if( is_array( $settings ) ) {
@@ -74,6 +83,17 @@ class Sitewide_Search_Admin {
 	 */
 	public static function add_post_type( $name, $post_type ) {
 		self::$post_types[ $name ] = $post_type->labels->name;
+	}
+
+	/**
+	 * Adds a taxnomy into the static array Sitewide_Search_Admin::taxonomies
+	 * @param string $name
+	 * @param string $post_type
+	 * @param array $taxonomy
+	 * @return void
+	 */
+	public static function add_taxonomy( $name, $post_type, $taxonomy ) {
+		self::$taxonomies[ $name ] = $taxonomy[ 'labels' ]->name;
 	}
 
 	/**
