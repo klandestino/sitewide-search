@@ -128,7 +128,7 @@ class Sitewide_Search {
 		global $wpdb;
 		$current_blog_id = $wpdb->blogid;
 
-		if( $this->settings[ 'archive_blog_id' ] != $current_blog_id && get_blogaddress_by_id( $this->settings[ 'archive_blog_id' ] ) ) {
+		if( $this->settings[ 'archive_blog_id' ] != $current_blog_id ) {
 			if( ! is_object( $post ) && array_key_exists( 'post_title', $_POST ) ) {
 				$post = ( object ) $_POST;
 			} elseif( ! is_object( $post ) && array_key_exists( 'post_title', $_GET ) ) {
@@ -137,7 +137,7 @@ class Sitewide_Search {
 
 			if( property_exists( $post, 'post_type' ) && property_exists( $post, 'post_status' ) ) {
 				if(
-					in_array( $post->post_type, $this->settings[ 'post_type' ] )
+					in_array( $post->post_type, $this->settings[ 'post_types' ] )
 					&& $post->post_status == 'publish'
 				) {
 					$permalink = get_permalink( $post->ID );
@@ -146,31 +146,27 @@ class Sitewide_Search {
 					$post->post_type = 'sitewide-search';
 					$post->ping_status = 'closed';
 					$post->comment_status = 'closed';
-					$copy = null;
+					$copy_id = 0;
 
 					$wpdb->set_blog_id( $this->settings[ 'archive_blog_id' ] );
 
-					if( property_exists( $post, 'ID' ) ) {
-						$copy = $wpdb->get_row( sprintf(
-							'SELECT `ID` FROM `%s` WHERE `guid` = "%d,%d"',
-							$wpdb->prepare( $wpdb->posts ),
-							$wpdb->prepare( $current_blog_id ),
-							$wpdb->prepare( $post->ID )
-						), OBJECT, 0 );
-					}
+					$copy_id = $wpdb->get_var( sprintf(
+						'SELECT `ID` FROM `%s` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
+						$wpdb->prepare( $wpdb->posts ),
+						$wpdb->prepare( $current_blog_id ),
+						$wpdb->prepare( $post_id )
+					) );
 
-					if( is_object( $copy ) ) {
-						$post->ID = $copy->ID;
-						wp_update_post( $post );
+					if( $copy_id ) {
+						$post->ID = $copy_id;
+						wp_update_post( ( array ) $post );
 					} else {
 						unset( $post->ID );
-						$copy = ( object ) array(
-							'ID' => wp_insert_post( $post )
-						);
+						$copy_id = wp_insert_post( ( array ) $post );
 					}
 
-					update_post_meta( $copy->ID, 'permalink', $permalink );
-					update_post_meta( $copy->ID, 'post_type', $post_type );
+					update_post_meta( $copy_id, 'permalink', $permalink );
+					update_post_meta( $copy_id, 'post_type', $post_type );
 
 					$wpdb->set_blog_id( $current_blog_id );
 				}
@@ -180,8 +176,50 @@ class Sitewide_Search {
 
 	/**
 	 * Saves taxonomies related to post
+	 * @param int $post_id
+	 * @param array $terms
+	 * @param array $term_ids
+	 * @param string $taxonomy
+	 * @return void
 	 */
 	public function save_taxonomy( $post_id, $terms, $term_ids, $taxonomy ) {
+		global $wpdb;
+		$current_blog_id = $wpdb->blogid;
+
+		if( $this->settings[ 'archive_blog_id' ] != $current_blog_id && get_blogaddress_by_id( $this->settings[ 'archive_blog_id' ] ) ) {
+			$post = get_post( $post_id, OBJECT );
+
+			if( $post ) {
+				if(
+					in_array( $post->post_type, $this->settings[ 'post_types' ] )
+					&& $post->post_status == 'publish'
+					&& in_array( $taxonomy, $this->settings[ 'taxonomies' ] )
+				) {
+					foreach( $terms as $i => $term ) {
+						if( is_numeric( $term ) ) {
+							$term = get_term( $term_id, $taxonomy, OBJECT );
+							$terms[ $i ] = $term->name;
+							unset( $term );
+						}
+					}
+
+					$wpdb->set_blog_id( $this->settings[ 'archive_blog_id' ] );
+
+					$copy_id = $wpdb->get_var( sprintf(
+						'SELECT `ID` FROM `%s` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
+						$wpdb->prepare( $wpdb->posts ),
+						$wpdb->prepare( $current_blog_id ),
+						$wpdb->prepare( $post_id )
+					) );
+
+					if( $copy_id ) {
+						wp_set_object_terms( $copy_id, $terms, $taxonomy );
+					}
+
+					$wpdb->set_blog_id( $current_blog_id );
+				}
+			}
+		}
 	}
 
 	/**
