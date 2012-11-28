@@ -1,6 +1,6 @@
 <?php
 
-global $wpdb;
+global $wpdb, $sitewide_search;
 $settings = Sitewide_Search_Admin::get_settings();
 
 ?>
@@ -12,12 +12,22 @@ $settings = Sitewide_Search_Admin::get_settings();
 			<?php if( $settings[ 'archive_blog_id' ] ) : ?>
 				<div class="widgets-holder-wrap">
 					<div class="sidebar-name">
+						<h3><span><?php _e( 'Status', 'sitewide-search' ); ?></span></h3>
+					</div>
+					<div class="widgets-sortables widget-holder">
+						<div class="sitewide-search-utilites">
+							<p class="description"><?php printf( __( 'Currently %d posts archived', 'sitewide-search' ), $sitewide_search->get_post_count() ); ?></p>
+						</div>
+					</div>
+				</div>
+				<div class="widgets-holder-wrap">
+					<div class="sidebar-name">
 						<h3><span><?php _e( 'Reset archive blog', 'sitewide-search' ); ?></span></h3>
 					</div>
 					<div class="widgets-sortables widget-holder">
 						<div class="sitewide-search-utilites">
 							<p class="description"><?php _e( 'Remove all current copies from the archive blog. WARNING: this is not undoable!', 'sitewide-search' ); ?></p>
-							<input id="sitewide-search-reset" type="button" class="button-primary" name="sitewide-search-reset" value="<?php echo esc_attr( __( 'Reset', 'sitewide-search' ) ); ?>" />
+							<input id="sitewide-search-reset" type="button" class="button-primary" name="sitewide-search-reset" value="<?php echo esc_attr( sprintf( __( 'Reset all %d posts', 'sitewide-search' ), $sitewide_search->get_post_count() ) ); ?>" />
 						</div>
 					</div>
 				</div>

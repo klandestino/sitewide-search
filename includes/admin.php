@@ -82,7 +82,9 @@ class Sitewide_Search_Admin {
 	 * @return void
 	 */
 	public static function add_post_type( $name, $post_type ) {
-		self::$post_types[ $name ] = $post_type->labels->name;
+		if( $name != 'sitewide-search' ) {
+			self::$post_types[ $name ] = $post_type->labels->name;
+		}
 	}
 
 	/**

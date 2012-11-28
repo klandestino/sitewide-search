@@ -52,6 +52,11 @@ class Sitewide_Search {
 	public $settings = array();
 
 	/**
+	 * Amount of sitewide-search post copies stored locally
+	 */
+	public $post_count = -1;
+
+	/**
 	 * Constructor
 	 */
 	function __construct() {
@@ -67,6 +72,8 @@ class Sitewide_Search {
 	public function add_actions_and_filters() {
 		// If there's no archive blog set, then there's no blog to save posts to
 		if( $this->settings[ 'archive_blog_id' ] ) {
+			// Register sitewide-search copy post-type
+			add_action( 'init', array( $this, 'register_post_type' ) );
 			// Handle post saving
 			add_action( 'save_post', array( $this, 'save_post' ), 10, 2 );
 			// Handle taxonomy inserts
@@ -82,6 +89,33 @@ class Sitewide_Search {
 			add_action( 'mature_blog', array( $this, 'delete_all_posts_by_blog' ) );
 			add_action( 'transition_post_status', array( $this, 'delete_all_posts_by_blog' ) );
 		}
+	}
+
+	/**
+	 * Get sitewide-search post copies count
+	 * @return int
+	 */
+	public function get_post_count() {
+		if( $this->post_count < 0 && $this->settings[ 'archive_blog_id' ] ) {
+			global $wpdb;
+			$current_blog_id = $wpdb->blogid;
+			$wpdb->set_blog_id( $this->settings[ 'archive_blog_id' ] );
+			$this->post_count = $wpdb->get_var( sprintf(
+				'SELECT COUNT( * ) FROM `%s` WHERE `post_type` = "sitewide-search"',
+				$wpdb->prepare( $wpdb->posts )
+			) );
+		}
+
+		return $this->post_count;
+	}
+
+	/**
+	 * Registers a post-type to use when saving sitewide-search post copies in the archive blog
+	 * @uses register_post_type
+	 * @return void
+	 */
+	public function register_post_type() {
+		register_post_type( 'sitewide-search' );
 	}
 
 	/**
@@ -108,6 +142,8 @@ class Sitewide_Search {
 				) {
 					$permalink = get_permalink( $post->ID );
 					$post->guid = sprintf( '%d,%d', $current_blog_id, $post->ID );
+					$post_type = $post->post_type;
+					$post->post_type = 'sitewide-search';
 					$post->ping_status = 'closed';
 					$post->comment_status = 'closed';
 					$copy = null;
@@ -134,6 +170,7 @@ class Sitewide_Search {
 					}
 
 					update_post_meta( $copy->ID, 'permalink', $permalink );
+					update_post_meta( $copy->ID, 'post_type', $post_type );
 
 					$wpdb->set_blog_id( $current_blog_id );
 				}
