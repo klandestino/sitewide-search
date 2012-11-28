@@ -35,6 +35,10 @@ class Sitewide_Search_Admin {
 		add_action( 'admin_enqueue_scripts', array( Sitewide_Search_Admin, 'enqueue_scripts' ) );
 		// Hook the get_blogs ajax request
 		add_action( 'wp_ajax_get_blogs', array( Sitewide_Search_Admin, 'get_blogs' ) );
+		// Hook the reset_archive ajax request
+		add_action( 'wp_ajax_reset_archive', array( Sitewide_Search_Admin, 'reset_archive' ) );
+		// Hook the repopulate_archive ajax request
+		add_action( 'wp_ajax_repopulate_archive', array( Sitewide_Search_Admin, 'repopulate_archive' ) );
 	}
 
 	/**
@@ -218,6 +222,37 @@ class Sitewide_Search_Admin {
 			exit;
 		} else {
 			return $blogs;
+		}
+	}
+
+	/**
+	 * Resets the archive blog, removes all posts
+	 * @uses Sitewide_Search::delete_all_posts
+	 * @return void
+	 */
+	static public function reset_archive() {
+		global $sitewide_search;
+		$sitewide_search->delete_all_posts();
+	}
+
+	/**
+	 * Repopulates the archive blog
+	 * @uses Sitewide_Search::save_post
+	 * @return void
+	 */
+	static public function repopulate_archive() {
+		global $wpdb, $sitewide_search;
+		$chunk = 30;
+		$count = self::get_post_count();
+		$settings = self::get_settings();
+
+		if( $settings[ 'archive_blog_id' ] ) {
+			$current_blog_id = $wpdb->blogid;
+			$wpdb->set_blog_id( $settings[ 'archive_blog_id' ] );
+
+			//
+
+			$wpdb->set_blog_id( $current_blog_id );
 		}
 	}
 

@@ -300,4 +300,31 @@ class Sitewide_Search {
 		}
 	}
 
+	/**
+	 * Delete all posts from archive blog
+	 * @uses wp_delete_post
+	 * @return void
+	 */
+	public function delete_all_posts() {
+		global $wpdb;
+
+		if( $this->settings[ 'archive_blog_id' ] ) {
+			$current_blog_id = $wpdb->blogid;
+			$wpdb->set_blog_id( $this->settings[ 'archive_blog_id' ] );
+
+			$copies = $wpdb->get_results( $wpdb->prepare(
+				'SELECT `ID` FROM `%s` WHERE `post_type` = "sitewide-search"',
+				$wpdb->posts
+			), OBJECT );
+
+			if( $copies ) {
+				foreach( $copies as $copy ) {
+					wp_delete_post( $copy->ID );
+				}
+			}
+
+			$wpdb->set_blog_id( $current_blog_id );
+		}
+	}
+
 }
