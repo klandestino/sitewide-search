@@ -346,15 +346,16 @@ class Sitewide_Search_Admin {
 						$step[ 'message' ] = sprintf( __( 'Copied %2$d of %3$d from %1$s.', 'sitewide-search' ), $step[ 'blog_name' ], $step[ 'post_done' ], $step[ 'post_count' ] );
 						$step[ 'post_count' ] -= $step[ 'post_done' ];
 					} else {
-						$step[ 'message' ] = sprintf( __( 'Blog %1$s of %2$s done. Switching blog...', 'sitewide-search' ), $step[ 'blog_name' ], $step[ 'blog_count' ] );
+						$step[ 'message' ] = sprintf( __( 'Blog %1$s done of %2$d left to do.', 'sitewide-search' ), $step[ 'blog_name' ], $step[ 'blog_count' ] - 1 );
 						$step[ 'post_count' ] = 0;
 					}
 				} else {
-					$step[ 'message' ] = sprintf( __( 'Blog %1$s is not public, skipping.', 'sitewide-search' ), $step[ 'blog_name' ] );
+					$step[ 'message' ] = sprintf( __( 'Blog %1$s is not public, skipping. %2$d left to do.', 'sitewide-search' ), $step[ 'blog_name' ], $step[ 'blog_count' ] - 1 );
 				}
 
 				if( ! $step[ 'post_done' ] ) {
 					$step[ 'post' ] = 0;
+					$step[ 'blog_count' ]--;
 					$step[ 'blog' ] = $wpdb->get_var( sprintf(
 						'SELECT `blog_id` FROM `%s` WHERE `blog_id` > "%d" ORDER BY `blog_id` ASC LIMIT 0,1',
 						$wpdb->prepare( $wpdb->blogs ),
@@ -362,11 +363,17 @@ class Sitewide_Search_Admin {
 					) );
 				}
 
-				$step[ 'status' ] = 'ok';
+				if( $step[ 'blog' ] ) {
+					$step[ 'status' ] = 'ok';
+				} else {
+					$step[ 'status' ] = 'done';
+				}
+
 				$step[ 'security' ] = wp_create_nonce( 'sitewide-search-repopulate' );
 				$step[ 'action' ] = 'repopulate_archive';
 			} else {
 				$step[ 'status' ] = 'done';
+				$step[ 'message' ] = __( 'No blogs found', 'sitewide-search' );
 			}
 		}
 

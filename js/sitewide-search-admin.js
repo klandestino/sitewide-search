@@ -138,6 +138,7 @@ jQuery( function( $ ) {
 								results.append( '<li>' + data.message + '</li>' );
 								sendRequest( data, callback );
 							} else if( data.status == 'done' ) {
+								results.append( '<li>' + data.message + '</li>' );
 								results.append( '<li>All done</li>' );
 								callback();
 							} else {

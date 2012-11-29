@@ -114,7 +114,7 @@ $settings = Sitewide_Search_Admin::get_settings();
 							<form id="sitewide-search-repopulate" action="" method="post">
 								<input type="hidden" name="security" value="<?php echo esc_attr( wp_create_nonce( 'sitewide-search-repopulate' ) ); ?>" />
 									<input type="hidden" name="action" value="repopulate_archive" />
-								<p class="description"><?php _e( 'Removes and repopulates the archive blog with posts from this network all blogs. WARNING: this is not undoable!', 'sitewide-search' ); ?></p>
+								<p class="description"><?php _e( 'Repopulates the archive blog with posts from this network all blogs. WARNING: depending on how many blogs and posts your site contains this can take a long time. Repopulate action is split into several requests of 100 posts each. Do not reload och leave this page when doing this!', 'sitewide-search' ); ?></p>
 								<input id="sitewide-search-repopulate-button" type="submit" class="button-primary" name="sitewide-search-repopulate" value="<?php echo esc_attr( __( 'Repopulate', 'sitewide-search' ) ); ?>" />
 								<ul class="sitewide-search-repopulate-results"></ul>
 							</form>
