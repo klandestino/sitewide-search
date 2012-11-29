@@ -87,12 +87,82 @@ jQuery( function( $ ) {
 	 * Sending a reset action to wordpress and listens for status
 	 */
 	function resetArchive() {
+		var button = $( this ).find( 'input:submit' );
+
+		if( ! button.hasClass( 'working' ) ) {
+			button.addClass( 'working' );
+
+			$.ajax( ajaxurl, {
+				type: 'post',
+				data: $( this ).serialize(),
+				dataType: 'json',
+				success: function( data ) {
+					button.removeClass( 'working' );
+
+					if( data ) {
+						button.val( button.val().replace( /[0-9]+/, '0' ) );
+					}
+				},
+				error: function() {
+					button.removeClass( 'working' );
+				}
+			} );
+		}
+
+		return false;
 	}
 
 	/**
 	 * Sending a repopulate action to wordpress and listens for status
 	 */
 	function repopulateArchive() {
+		var resultCount = 5;
+		var button = $( this ).find( 'input:submit' );
+		var results = $( this ).find( 'ul.sitewide-search-repopulate-results' );
+
+		if( ! button.hasClass( 'working' ) ) {
+			button.addClass( 'working' );
+
+			function sendRequest( input, callback ) {
+				$.ajax( ajaxurl, {
+					type: 'post',
+					data: input,
+					dataType: 'json',
+					success: function( data ) {
+						if( data ) {
+							if( results.find( 'li' ).length >= resultCount ) {
+								results.find( 'li:first' ).remove();
+							}
+
+							if( data.status == 'ok' ) {
+								results.append( '<li>' + data.message + '</li>' );
+								sendRequest( data, callback );
+							} else if( data.status == 'done' ) {
+								results.append( '<li>All done</li>' );
+								callback();
+							} else {
+								results.append( '<li>Fail</li>' );
+								callback();
+							}
+						} else {
+							results.append( '<li>Fail</li>' );
+							callback();
+						}
+					},
+					error: function() {
+						button.removeClass( 'working' );
+						results.append( '<li>Fail</li>' );
+						callback();
+					}
+				} );
+			}
+
+			sendRequest( $( this ).serialize(), function() {
+				button.removeClass( 'working' );
+			} );
+		}
+
+		return false;
 	}
 
 	/**
@@ -100,7 +170,7 @@ jQuery( function( $ ) {
 	 */
 
 	$( '#blog-search' ).keydown( searchByTimeout );
-	$( '#sitewide-search-reset' ).click( resetArchive );
-	$( '#sitewide-search-repopulate' ).click( repopulateArchive );
+	$( '#sitewide-search-reset' ).submit( resetArchive );
+	$( '#sitewide-search-repopulate' ).submit( repopulateArchive );
 
 } );

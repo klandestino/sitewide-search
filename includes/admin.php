@@ -188,14 +188,14 @@ class Sitewide_Search_Admin {
 		if( is_array( $query ) ) {
 			$query = $wpdb->get_results( sprintf(
 				'SELECT `blog_id`, `domain` FROM `%s` WHERE `blog_id` IN ( %s )',
-				mysql_real_escape_string( $wpdb->blogs ),
-				mysql_real_escape_string( implode( ',', $query ) )
+				$wpdb->prepare( $wpdb->blogs ),
+				$wpdb->prepare( implode( ',', $query ) )
 			), ARRAY_A );
 		} elseif( ! empty( $query ) ) {
 			$query = $wpdb->get_results( sprintf(
 				'SELECT `blog_id`, `domain` FROM `%s` WHERE `domain` LIKE "%%%s%%"',
-				mysql_real_escape_string( $wpdb->blogs ),
-				mysql_real_escape_string( $query )
+				$wpdb->prepare( $wpdb->blogs ),
+				$wpdb->prepare( $query )
 			), ARRAY_A );
 		}
 
@@ -204,7 +204,7 @@ class Sitewide_Search_Admin {
 
 			$subquery = $wpdb->get_results( sprintf(
 				'SELECT `option_name`, `option_value` FROM `%s` WHERE `option_name` IN ( "siteurl", "blogname", "blogdescription" )',
-				mysql_real_escape_string( $wpdb->options )
+				$wpdb->prepare( $wpdb->options )
 			), ARRAY_A );
 
 			foreach( $subquery as $opt ) {
@@ -226,34 +226,153 @@ class Sitewide_Search_Admin {
 	}
 
 	/**
-	 * Resets the archive blog, removes all posts
+	 * This is an ajax action.
+	 * Resets the archive blog, removes all posts.
+	 * Prints a json encoded array when done.
 	 * @uses Sitewide_Search::delete_all_posts
+	 * @uses json_encode
 	 * @return void
 	 */
 	static public function reset_archive() {
+		check_ajax_referer( 'sitewide-search-reset', 'security' );
+
 		global $sitewide_search;
 		$sitewide_search->delete_all_posts();
+
+		echo json_encode( array( 'deleted' => 'all' ) );
+		// Exit when done and before wordpress or something else prints a zero.
+		exit;
 	}
 
 	/**
-	 * Repopulates the archive blog
+	 * This is an ajax action.
+	 * Repopulates the archive blog.
+	 * Prints a json encoded array when done.
 	 * @uses Sitewide_Search::save_post
 	 * @return void
 	 */
 	static public function repopulate_archive() {
+		check_ajax_referer( 'sitewide-search-repopulate', 'security' );
+
 		global $wpdb, $sitewide_search;
-		$chunk = 30;
-		$count = self::get_post_count();
+		$chunk = 100;
+		$step = array(
+			'blog' => 0,
+			'blog_count' => 0,
+			'post' => 0,
+			'post_count' => 0,
+		);
 		$settings = self::get_settings();
 
 		if( $settings[ 'archive_blog_id' ] ) {
-			$current_blog_id = $wpdb->blogid;
-			$wpdb->set_blog_id( $settings[ 'archive_blog_id' ] );
+			foreach( $step as $i => $prop ) {
+				if( array_key_exists( $i, $_POST ) ) {
+					$step[ $i ] = ( int ) $_POST[ $i ];
+				}
 
-			//
+				if( ! is_numeric( $step[ $i ] ) ) {
+					$step[ $i ] = $prop;
+				}
+			}
 
-			$wpdb->set_blog_id( $current_blog_id );
+			if( ! $step[ 'blog' ] ) {
+				$step[ 'blog' ] = $wpdb->get_var( sprintf(
+					'SELECT `blog_id` FROM `%s` ORDER BY `blog_id` ASC LIMIT 0,1',
+					$wpdb->prepare( $wpdb->blogs )
+				) );
+			} else {
+				$step[ 'blog' ] = $wpdb->get_var( sprintf(
+					'SELECT `blog_id` FROM `%s` WHERE `blog_id` = "%d" LIMIT 0,1',
+					$wpdb->prepare( $wpdb->blogs ),
+					$wpdb->prepare( $step[ 'blog' ] )
+				) );
+			}
+
+			if( $step[ 'blog' ] ) {
+				$step[ 'post_done' ] = 0;
+				$step[ 'blog_name' ] = get_blog_option( $step[ 'blog' ], 'blogname' );
+
+				if( ! $step[ 'blog_count' ] ) {
+					$step[ 'blog_count' ] = $wpdb->get_var( sprintf(
+						'SELECT COUNT( * ) FROM `%s`',
+						$wpdb->prepare( $wpdb->blogs )
+					) );
+				}
+
+				if( get_blog_option( $step[ 'blog' ], 'public', true ) ) {
+					$wpdb->set_blog_id( $step[ 'blog' ] );
+
+					if( ! $step[ 'post_count' ] ) {
+						$step[ 'post_count' ] = $wpdb->get_var( sprintf(
+							'SELECT COUNT( * ) FROM `%s` WHERE `post_status` = "publish" AND `post_type` IN ( %s )',
+							$wpdb->prepare( $wpdb->posts ),
+							$wpdb->prepare( sprintf( '"%s"', implode( '","', $settings[ 'post_types' ] ) ) )
+						) );
+					}
+
+					$posts = $wpdb->get_results( sprintf(
+						'SELECT `ID` FROM `%s` WHERE `ID` > "%d" AND `post_status` = "publish" AND `post_type` IN ( %s ) ORDER BY `ID` ASC LIMIT 0,%d',
+						$wpdb->prepare( $wpdb->posts ),
+						$wpdb->prepare( $step[ 'post' ] ),
+						$wpdb->prepare( sprintf( '"%s"', implode( '","', $settings[ 'post_types' ] ) ) ),
+						$wpdb->prepare( $chunk )
+					), OBJECT );
+
+					if( $posts ) {
+						$step[ 'post_done' ] = $wpdb->num_rows;
+
+						foreach( $posts as $post ) {
+							$sitewide_search->save_post( $post->ID );
+							$step[ 'post' ] = $post->ID;
+							$terms = wp_get_object_terms( $post->ID, $settings[ 'taxonomies' ] );
+							$tax = array();
+
+							foreach( $terms as $term ) {
+								if( ! is_array( $tax[ $term->taxonomy ] ) ) {
+									$tax[ $term->taxonomy ] = array( 'terms' => array(), 'term_ids' => array() );
+								}
+
+								$tax[ $term->taxonomy ][ 'terms' ][] = $term->name;
+								$tax[ $term->taxonomy ][ 'term_ids' ][] = $term->term_id;
+							}
+
+							foreach( $tax as $tax_name => $term ) {
+								$sitewide_search->save_taxonomy( $post->ID, $term[ 'terms' ], $terms[ 'term_ids' ], $tax_name );
+							}
+						}
+					}
+
+					if( $step[ 'post_done' ] ) {
+						$step[ 'message' ] = sprintf( __( 'Copied %2$d of %3$d from %1$s.', 'sitewide-search' ), $step[ 'blog_name' ], $step[ 'post_done' ], $step[ 'post_count' ] );
+						$step[ 'post_count' ] -= $step[ 'post_done' ];
+					} else {
+						$step[ 'message' ] = sprintf( __( 'Blog %1$s of %2$s done. Switching blog...', 'sitewide-search' ), $step[ 'blog_name' ], $step[ 'blog_count' ] );
+						$step[ 'post_count' ] = 0;
+					}
+				} else {
+					$step[ 'message' ] = sprintf( __( 'Blog %1$s is not public, skipping.', 'sitewide-search' ), $step[ 'blog_name' ] );
+				}
+
+				if( ! $step[ 'post_done' ] ) {
+					$step[ 'post' ] = 0;
+					$step[ 'blog' ] = $wpdb->get_var( sprintf(
+						'SELECT `blog_id` FROM `%s` WHERE `blog_id` > "%d" ORDER BY `blog_id` ASC LIMIT 0,1',
+						$wpdb->prepare( $wpdb->blogs ),
+						$wpdb->prepare( $step[ 'blog' ] )
+					) );
+				}
+
+				$step[ 'status' ] = 'ok';
+				$step[ 'security' ] = wp_create_nonce( 'sitewide-search-repopulate' );
+				$step[ 'action' ] = 'repopulate_archive';
+			} else {
+				$step[ 'status' ] = 'done';
+			}
 		}
+
+		echo json_encode( $step );
+		// Exit when done and before wordpress or something else prints a zero.
+		exit;
 	}
 
 }

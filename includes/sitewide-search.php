@@ -131,11 +131,13 @@ class Sitewide_Search {
 		global $wpdb;
 		$current_blog_id = $wpdb->blogid;
 
-		if( $this->settings[ 'archive_blog_id' ] != $current_blog_id ) {
+		if( $this->settings[ 'archive_blog_id' ] != $current_blog_id && get_blog_option( $current_blog_id, 'public', true ) ) {
 			if( ! is_object( $post ) && array_key_exists( 'post_title', $_POST ) ) {
 				$post = ( object ) $_POST;
 			} elseif( ! is_object( $post ) && array_key_exists( 'post_title', $_GET ) ) {
 				$post = ( object ) $_GET;
+			} elseif( ! is_object( $post ) ) {
+				$post = get_post( $post_id );
 			}
 
 			if( property_exists( $post, 'post_type' ) && property_exists( $post, 'post_status' ) ) {
@@ -265,7 +267,7 @@ class Sitewide_Search {
 		global $blog_id;
 
 		if( $this->settings[ 'archive_blog_id' ] != $blog_id ) {
-			if( ! get_blog_option( $blog_id, 'public' ) ) {
+			if( ! get_blog_option( $blog_id, 'public', true ) ) {
 				$this->delete_all_posts_by_blog( $blog_id );
 			}
 		}
@@ -312,9 +314,9 @@ class Sitewide_Search {
 			$current_blog_id = $wpdb->blogid;
 			$wpdb->set_blog_id( $this->settings[ 'archive_blog_id' ] );
 
-			$copies = $wpdb->get_results( $wpdb->prepare(
+			$copies = $wpdb->get_results( sprintf(
 				'SELECT `ID` FROM `%s` WHERE `post_type` = "sitewide-search"',
-				$wpdb->posts
+				$wpdb->prepare( $wpdb->posts )
 			), OBJECT );
 
 			if( $copies ) {
