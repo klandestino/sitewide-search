@@ -101,7 +101,7 @@ $settings = Sitewide_Search_Admin::get_settings();
 									<input type="hidden" name="confirm" value="<?php echo esc_attr( sprintf( __( 'You\'re about to remove all %d posts. Do you want to continue?', 'sitewide-search' ), $sitewide_search->get_post_count() ) ); ?>" />
 									<p><?php _e( 'Remove all current copies from the archive blog.', 'sitewide-search' ); ?></p>
 									<h4><?php _e( 'WARNING:', 'sitewide-search' ); ?></h4>
-									<p><?php _e( 'Think twice before you do this, this is not undoable!', 'sitewide-search' ); ?></p>
+									<p><?php _e( 'Think twice before you do this, This is not undoable!', 'sitewide-search' ); ?></p>
 									<p><input id="sitewide-search-reset-button" type="submit" class="button-primary" name="sitewide-search-reset" value="<?php echo esc_attr( sprintf( __( 'Remove all %d posts', 'sitewide-search' ), $sitewide_search->get_post_count() ) ); ?>" /></p>
 								</form>
 							</div>
