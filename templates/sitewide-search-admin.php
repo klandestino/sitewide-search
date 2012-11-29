@@ -98,8 +98,11 @@ $settings = Sitewide_Search_Admin::get_settings();
 								<form id="sitewide-search-reset" action="" method="post">
 									<input type="hidden" name="security" value="<?php echo esc_attr( wp_create_nonce( 'sitewide-search-reset' ) ); ?>" />
 									<input type="hidden" name="action" value="reset_archive" />
-									<p class="description"><?php _e( 'Remove all current copies from the archive blog. WARNING: this is not undoable!', 'sitewide-search' ); ?></p>
-									<input id="sitewide-search-reset-button" type="submit" class="button-primary" name="sitewide-search-reset" value="<?php echo esc_attr( sprintf( __( 'Reset all %d posts', 'sitewide-search' ), $sitewide_search->get_post_count() ) ); ?>" />
+									<input type="hidden" name="confirm" value="<?php echo esc_attr( sprintf( __( 'You\'re about to remove all %d posts. Do you want to continue?', 'sitewide-search' ), $sitewide_search->get_post_count() ) ); ?>" />
+									<p><?php _e( 'Remove all current copies from the archive blog.', 'sitewide-search' ); ?></p>
+									<h4><?php _e( 'WARNING:', 'sitewide-search' ); ?></h4>
+									<p><?php _e( 'Think twice before you do this, this is not undoable!', 'sitewide-search' ); ?></p>
+									<p><input id="sitewide-search-reset-button" type="submit" class="button-primary" name="sitewide-search-reset" value="<?php echo esc_attr( sprintf( __( 'Remove all %d posts', 'sitewide-search' ), $sitewide_search->get_post_count() ) ); ?>" /></p>
 								</form>
 							</div>
 						</div>
@@ -107,16 +110,19 @@ $settings = Sitewide_Search_Admin::get_settings();
 				<?php endif; ?>
 				<div class="widgets-holder-wrap">
 					<div class="sidebar-name">
-						<h3><span><?php _e( 'Repopulate archive blog', 'sitewide-search' ); ?></span></h3>
+						<h3><span><?php _e( 'Populate archive blog', 'sitewide-search' ); ?></span></h3>
 					</div>
 					<div class="widgets-sortables widget-holder">
 						<div class="sitewide-search-utilites">
-							<form id="sitewide-search-repopulate" action="" method="post">
-								<input type="hidden" name="security" value="<?php echo esc_attr( wp_create_nonce( 'sitewide-search-repopulate' ) ); ?>" />
-									<input type="hidden" name="action" value="repopulate_archive" />
-								<p class="description"><?php _e( 'Repopulates the archive blog with posts from this network all blogs. WARNING: depending on how many blogs and posts your site contains this can take a long time. Repopulate action is split into several requests of 100 posts each. Do not reload och leave this page when doing this!', 'sitewide-search' ); ?></p>
-								<input id="sitewide-search-repopulate-button" type="submit" class="button-primary" name="sitewide-search-repopulate" value="<?php echo esc_attr( __( 'Repopulate', 'sitewide-search' ) ); ?>" />
-								<ul class="sitewide-search-repopulate-results"></ul>
+							<form id="sitewide-search-populate" action="" method="post">
+								<input type="hidden" name="security" value="<?php echo esc_attr( wp_create_nonce( 'sitewide-search-populate' ) ); ?>" />
+								<input type="hidden" name="action" value="populate_archive" />
+								<p><?php _e( 'Populates the archive blog with posts from this network all blogs.', 'sitewide-search' ); ?></p>
+								<h4><?php _e( 'WARNING:', 'sitewide-search' ); ?></h4>
+								<p><?php _e( 'Depending on how many blogs and posts your site contains this can take a long time. Populate action is split into several requests of 100 posts each.', 'sitewide-search' ); ?></p>
+								<p><?php _e( 'Do not reload or leave this page when doing this!', 'sitewide-search' ); ?></p>
+								<p><input id="sitewide-search-populate-button" type="submit" class="button-primary" name="sitewide-search-populate" value="<?php echo esc_attr( __( 'Populate', 'sitewide-search' ) ); ?>" /></p>
+								<ul class="sitewide-search-populate-results"></ul>
 							</form>
 						</div>
 					</div>

@@ -37,8 +37,8 @@ class Sitewide_Search_Admin {
 		add_action( 'wp_ajax_get_blogs', array( Sitewide_Search_Admin, 'get_blogs' ) );
 		// Hook the reset_archive ajax request
 		add_action( 'wp_ajax_reset_archive', array( Sitewide_Search_Admin, 'reset_archive' ) );
-		// Hook the repopulate_archive ajax request
-		add_action( 'wp_ajax_repopulate_archive', array( Sitewide_Search_Admin, 'repopulate_archive' ) );
+		// Hook the populate_archive ajax request
+		add_action( 'wp_ajax_populate_archive', array( Sitewide_Search_Admin, 'populate_archive' ) );
 	}
 
 	/**
@@ -246,13 +246,13 @@ class Sitewide_Search_Admin {
 
 	/**
 	 * This is an ajax action.
-	 * Repopulates the archive blog.
+	 * populates the archive blog.
 	 * Prints a json encoded array when done.
 	 * @uses Sitewide_Search::save_post
 	 * @return void
 	 */
-	static public function repopulate_archive() {
-		check_ajax_referer( 'sitewide-search-repopulate', 'security' );
+	static public function populate_archive() {
+		check_ajax_referer( 'sitewide-search-populate', 'security' );
 
 		global $wpdb, $sitewide_search;
 		$chunk = 100;
@@ -369,8 +369,8 @@ class Sitewide_Search_Admin {
 					$step[ 'status' ] = 'done';
 				}
 
-				$step[ 'security' ] = wp_create_nonce( 'sitewide-search-repopulate' );
-				$step[ 'action' ] = 'repopulate_archive';
+				$step[ 'security' ] = wp_create_nonce( 'sitewide-search-populate' );
+				$step[ 'action' ] = 'populate_archive';
 			} else {
 				$step[ 'status' ] = 'done';
 				$step[ 'message' ] = __( 'No blogs found', 'sitewide-search' );

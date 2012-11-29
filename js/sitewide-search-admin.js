@@ -89,8 +89,15 @@ jQuery( function( $ ) {
 	function resetArchive() {
 		var button = $( this ).find( 'input:submit' );
 
-		if( ! button.hasClass( 'working' ) ) {
+		if(
+			confirm( $( this ).find( 'input[name=confirm]' ).val() )
+			&& ! button.hasClass( 'working' )
+			&& $( '#sitewide-search-populate .working' ).length == 0
+		) {
 			button.addClass( 'working' );
+			$( window ).bind( 'beforeunload.sitewide-search-reset', function() {
+				return false;
+	  		} );
 
 			$.ajax( ajaxurl, {
 				type: 'post',
@@ -98,6 +105,7 @@ jQuery( function( $ ) {
 				dataType: 'json',
 				success: function( data ) {
 					button.removeClass( 'working' );
+					$( window ).unbind( 'beforeunload.sitewide-search-reset' );
 
 					if( data ) {
 						button.val( button.val().replace( /[0-9]+/, '0' ) );
@@ -105,6 +113,7 @@ jQuery( function( $ ) {
 				},
 				error: function() {
 					button.removeClass( 'working' );
+					$( window ).unbind( 'beforeunload.sitewide-search-reset' );
 				}
 			} );
 		}
@@ -113,15 +122,18 @@ jQuery( function( $ ) {
 	}
 
 	/**
-	 * Sending a repopulate action to wordpress and listens for status
+	 * Sending a populate action to wordpress and listens for status
 	 */
-	function repopulateArchive() {
+	function populateArchive() {
 		var resultCount = 5;
 		var button = $( this ).find( 'input:submit' );
-		var results = $( this ).find( 'ul.sitewide-search-repopulate-results' );
+		var results = $( this ).find( 'ul.sitewide-search-populate-results' );
 
-		if( ! button.hasClass( 'working' ) ) {
+		if( ! button.hasClass( 'working' ) && $( '#sitewide-search-reset .working' ).length == 0 ) {
 			button.addClass( 'working' );
+			$( window ).bind( 'beforeunload.sitewide-search-populate', function() {
+				return false;
+	  		} );
 
 			function sendRequest( input, callback ) {
 				$.ajax( ajaxurl, {
@@ -160,6 +172,7 @@ jQuery( function( $ ) {
 
 			sendRequest( $( this ).serialize(), function() {
 				button.removeClass( 'working' );
+				$( window ).unbind( 'beforeunload.sitewide-search-populate' );
 			} );
 		}
 
@@ -172,6 +185,6 @@ jQuery( function( $ ) {
 
 	$( '#blog-search' ).keydown( searchByTimeout );
 	$( '#sitewide-search-reset' ).submit( resetArchive );
-	$( '#sitewide-search-repopulate' ).submit( repopulateArchive );
+	$( '#sitewide-search-populate' ).submit( populateArchive );
 
 } );
