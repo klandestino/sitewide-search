@@ -145,7 +145,7 @@ class Sitewide_Search {
 					in_array( $post->post_type, $this->settings[ 'post_types' ] )
 					&& $post->post_status == 'publish'
 				) {
-					$permalink = get_permalink( $post->ID );
+					$permalink = get_blog_permalink( $current_blog_id, $post->ID );
 					$post->guid = sprintf( '%d,%d', $current_blog_id, $post->ID );
 					$post_type = $post->post_type;
 					$post->post_type = 'sitewide-search';
