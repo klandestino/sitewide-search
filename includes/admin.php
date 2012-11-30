@@ -62,10 +62,12 @@ class Sitewide_Search_Admin {
 	static public function get_settings() {
 		$settings = get_site_option( 'sitewide_search_settings', array() );
 		$defaults = array(
-			'enabled' => false,
 			'archive_blog_id' => 0,
 			'post_types' => array( 'post' ),
-			'taxonomies' => array( 'post_tag', 'category' )
+			'taxonomies' => array( 'post_tag', 'category' ),
+			'enable_search' => true,
+			'enable_categories' => false,
+			'enable_tags' => false
 		);
 
 		if( is_array( $settings ) ) {
@@ -323,22 +325,7 @@ class Sitewide_Search_Admin {
 
 						foreach( $posts as $post ) {
 							$sitewide_search->save_post( $post->ID );
-							$step[ 'post' ] = $post->ID;
-							$terms = wp_get_object_terms( $post->ID, $settings[ 'taxonomies' ] );
-							$tax = array();
-
-							foreach( $terms as $term ) {
-								if( ! is_array( $tax[ $term->taxonomy ] ) ) {
-									$tax[ $term->taxonomy ] = array( 'terms' => array(), 'term_ids' => array() );
-								}
-
-								$tax[ $term->taxonomy ][ 'terms' ][] = $term->name;
-								$tax[ $term->taxonomy ][ 'term_ids' ][] = $term->term_id;
-							}
-
-							foreach( $tax as $tax_name => $term ) {
-								$sitewide_search->save_taxonomy( $post->ID, $term[ 'terms' ], $terms[ 'term_ids' ], $tax_name );
-							}
+							$step[ 'post' ] = $post->ID;	
 						}
 					}
 
