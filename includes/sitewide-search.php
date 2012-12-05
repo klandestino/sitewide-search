@@ -407,9 +407,10 @@ class Sitewide_Search {
 			$this->settings[ 'archive_blog_id' ]
 			&& (
 				( $this->settings[ 'enable_search' ] && $query->is_search )
+				|| ( $this->settings[ 'enable_archive' ] && $query->is_archive )
 				|| ( $this->settings[ 'enable_categories' ] && $query->is_category )
 				|| ( $this->settings[ 'enable_tags' ] && $query->is_tag )
-				|| ( $this->settings[ 'enable_author' ] && $query->is_archive )
+				|| ( $this->settings[ 'enable_author' ] && $query->is_author )
 			)
 			&& ! $is_forum
 		) {
