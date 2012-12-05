@@ -3,9 +3,9 @@
 /*
 Plugin Name: Sitewide Search
 Plugin URI: https://github.com/klandestino/
-Description: Searches, archives, tags and categories for all blogs
-Version: 0.1
-Revision Date: 11 27, 2012
+Description: Creates sitewide searching and archive/category/tag/author browsing
+Version: 0.9
+Revision Date: 12 05, 2012
 Requires at least: 3.4.2
 Tested up to: 3.4.2
 License: GNU General Public License 2.0 (GPL) http://www.gnu.org/licenses/gpl.html
