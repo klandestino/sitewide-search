@@ -406,10 +406,10 @@ class Sitewide_Search {
 		if(
 			$this->settings[ 'archive_blog_id' ]
 			&& (
-				$query->is_search
-				|| $query->is_category
-				//|| $query->is_tag
-				//|| $query->is_archive
+				( $this->settings[ 'enable_search' ] && $query->is_search )
+				|| ( $this->settings[ 'enable_categories' ] && $query->is_category )
+				|| ( $this->settings[ 'enable_tags' ] && $query->is_tag )
+				|| ( $this->settings[ 'enable_author' ] && $query->is_archive )
 			)
 			&& ! $is_forum
 		) {
@@ -419,12 +419,6 @@ class Sitewide_Search {
 				$this->current_blog_id = $wpdb->blogid;
 				$wpdb->set_blog_id( $this->settings[ 'archive_blog_id' ] );
 			}
-
-			/*if( is_search() ) {
-				$query->query_vars = array_merge( $query->query_vars, array( 'post_type' =>
-					$this->settings[ 'post_types' ]
-				) );
-			}*/
 
 			// The filter posts_results is executed just after the query
 			// was executed. We'll use it as a after_get_posts-action.

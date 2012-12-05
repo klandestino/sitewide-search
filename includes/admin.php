@@ -65,9 +65,10 @@ class Sitewide_Search_Admin {
 			'archive_blog_id' => 0,
 			'post_types' => array( 'post' ),
 			'taxonomies' => array( 'post_tag', 'category' ),
-			'enable_search' => true,
+			'enable_search' => false,
 			'enable_categories' => false,
-			'enable_tags' => false
+			'enable_tags' => false,
+			'enable_author' => false
 		);
 
 		if( is_array( $settings ) ) {
@@ -153,6 +154,16 @@ class Sitewide_Search_Admin {
 			foreach( $settings as $key => $val ) {
 				if( array_key_exists( $key, $_POST ) ) {
 					$settings[ $key ] = $_POST[ $key ];
+				}
+			}
+
+			foreach( array(
+				'enable_search', 'enable_categories', 'enable_tags', 'enable_author'
+			) as $override ) {
+				if( ! array_key_exists( $override, $_POST ) ) {
+					$settings[ $override ] = false;
+				} else {
+					$settings[ $override ] = ! empty( $settings[ $override ] );
 				}
 			}
 

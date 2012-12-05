@@ -78,6 +78,23 @@ $settings = Sitewide_Search_Admin::get_settings();
 						</td>
 					</tr>
 
+					<?php foreach( array(
+						'enable_search' => array( __( 'Override search results', 'sitewide-search' ), __( 'Wherever visitors are searching, results will always be fetched from the archive.', 'sitewide-search' ) ),
+						'enable_categories' => array( __( 'Override categories results', 'sitewide-search' ), __( 'Wherever visitors are browsing posts by categories, results will always be fetched from the archive.', 'sitewide-search' ) ),
+						'enable_tags' => array( __( 'Override tag results', 'sitewide-search' ), __( 'Wherever visitors are browsing posts by tags, results will always be fetched from the archive.', 'sitewide-search' ) ),
+						'enable_author' => array( __( 'Override author results', 'sitewide-search' ), __( 'Wherever visitors are browsing posts by author, results will always be fetched from the archive.', 'sitewide-search' ) )
+					) as $override_name => $override ) : ?>
+						<tr>
+							<th scope="row">
+								<label for="<?php echo $override_name; ?>"><?php echo $override[ 0 ]; ?></label><br />
+								<em><?php echo $override[ 1 ]; ?></em>
+							</th>
+							<td>
+								<input type="checkbox" id="<?php echo $override_name; ?>" name="<?php echo $override_name; ?>" <?php if( $settings[ $override_name ] ) echo 'checked="checked"'; ?> />
+							</td>
+						</tr>
+					<?php endforeach; ?>
+
 				</tbody>
 			</table>
 
