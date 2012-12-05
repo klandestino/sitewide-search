@@ -40,7 +40,7 @@ Sitewide_Search_Admin::__setup();
  * @return void
  */
 function sitewide_search_load_textdomain() {
-	load_plugin_textdomain( 'sitewide-search', false, plugin_basename( BP_FORUM_NOTIFIER_PLUGIN_DIR ) . "/languages/" );
+	load_plugin_textdomain( 'sitewide-search', false, plugin_basename( SITEWIDE_SEARCH_PLUGIN_DIR ) . "/languages/" );
 }
 
 // Hook languages-loading function to wordpress init action
