@@ -1,0 +1,185 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-12-05 17:07+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: includes/admin.php:128 templates/sitewide-search-admin.php:8
+msgid "Sitewide Search Settings"
+msgstr ""
+
+#: includes/admin.php:129
+msgid "Sitewide Search"
+msgstr ""
+
+#: includes/admin.php:179
+msgid "Settings updated."
+msgstr ""
+
+#: includes/admin.php:368
+#, php-format
+msgid "Copied %2$d of %3$d from %1$s."
+msgstr ""
+
+#: includes/admin.php:372
+#, php-format
+msgid "Blog %1$s done of %2$d left to do."
+msgstr ""
+
+#: includes/admin.php:376
+#, php-format
+msgid "Blog %1$s is not public, skipping. %2$d left to do."
+msgstr ""
+
+#: includes/admin.php:403
+msgid "No blogs found"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:19
+msgid "Archive blog"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:20
+msgid ""
+"Search for blogs by domain in the search field to the right. Select one blog "
+"to be the archive blog. All posts with choosen post types (see below) will "
+"be copied into this blog and all searches and archive browsing will be done "
+"from this blog."
+msgstr ""
+
+#: templates/sitewide-search-admin.php:28
+#: templates/sitewide-search-admin.php:39
+msgid "View blog"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:49
+msgid "Post types"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:50
+msgid "Choose post types that will be copied into the archive blog"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:66
+msgid "Taxonomies"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:67
+msgid "Choose taxonomies that will be copied into the archive blog"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:82
+msgid "Override search"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:82
+msgid ""
+"Wherever visitors are searching, results will always be fetched from the "
+"archive."
+msgstr ""
+
+#: templates/sitewide-search-admin.php:83
+msgid "Override archive"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:83
+msgid ""
+"Wherever visitors are browsing archives, results will always be fetched from "
+"the archive."
+msgstr ""
+
+#: templates/sitewide-search-admin.php:84
+msgid "Override categories"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:84
+msgid ""
+"Wherever visitors are browsing posts by categories, results will always be "
+"fetched from the archive."
+msgstr ""
+
+#: templates/sitewide-search-admin.php:85
+msgid "Override tags"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:85
+msgid ""
+"Wherever visitors are browsing posts by tags, results will always be fetched "
+"from the archive."
+msgstr ""
+
+#: templates/sitewide-search-admin.php:86
+msgid "Override author"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:86
+msgid ""
+"Wherever visitors are browsing posts by author, results will always be "
+"fetched from the archive."
+msgstr ""
+
+#: templates/sitewide-search-admin.php:102
+msgid "Save"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:112
+msgid "Reset archive blog"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:119
+#, php-format
+msgid "You're about to remove all %d posts. Do you want to continue?"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:120
+msgid "Remove all current copies from the archive blog."
+msgstr ""
+
+#: templates/sitewide-search-admin.php:121
+#: templates/sitewide-search-admin.php:139
+msgid "WARNING:"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:122
+msgid "Think twice before you do this, This is not undoable!"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:123
+#, php-format
+msgid "Remove all %d posts"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:131
+msgid "Populate archive blog"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:138
+msgid "Populates the archive blog with posts from this network all blogs."
+msgstr ""
+
+#: templates/sitewide-search-admin.php:140
+msgid ""
+"Depending on how many blogs and posts your site contains this can take a "
+"long time. Populate action is split into several requests of 100 posts each."
+msgstr ""
+
+#: templates/sitewide-search-admin.php:141
+msgid "Do not reload or leave this page when doing this!"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:142
+msgid "Populate"
+msgstr ""
