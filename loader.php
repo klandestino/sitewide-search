@@ -4,7 +4,7 @@
 Plugin Name: Sitewide Search
 Plugin URI: https://github.com/klandestino/
 Description: Creates sitewide searching and archive/category/tag/author browsing
-Version: 0.9
+Version: 0.9.1
 Revision Date: 12 05, 2012
 Requires at least: 3.4.2
 Tested up to: 3.4.2
