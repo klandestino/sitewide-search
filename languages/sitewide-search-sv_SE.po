@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-05 17:07+0100\n"
-"PO-Revision-Date: 2012-12-05 17:20+0100\n"
+"POT-Creation-Date: 2012-12-06 21:34+0100\n"
+"PO-Revision-Date: 2012-12-06 21:37+0100\n"
 "Last-Translator: spurge <olof@klandestino.se>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -157,14 +157,18 @@ msgid "Populates the archive blog with posts from this network all blogs."
 msgstr "Kopierar inlägg från nätverkets alla bloggar till arkivbloggen."
 
 #: templates/sitewide-search-admin.php:140
-msgid "Depending on how many blogs and posts your site contains this can take a long time. Populate action is split into several requests of 100 posts each."
-msgstr "Beroende på hur många bloggar och poster den här webbplatsen innehåller, så kan detta ta lång tid. Kopieringen är uppdelad i 100 poster stora delar."
+msgid "Depending on how many blogs and posts your site contains this can take a long time. Populate action is split into several requests of a specified amount of posts each. Choose a lower amount of posts per request if your server tend to fail during populate."
+msgstr "Beroende på hur många bloggar och poster den här webbplatsen innehåller, så kan detta ta lång tid. Kopieringen är uppdelad i ett inställningsbart antal inlägg per anrop. Välj ett lägre antal inlägg per anrop ifall din server tenderar att lyckas avsluta kopieringen."
 
 #: templates/sitewide-search-admin.php:141
 msgid "Do not reload or leave this page when doing this!"
-msgstr "Ladda inte om eller lämna denna sida under när du kopierar!"
+msgstr "Ladda inte om eller lämna denna sida när du kopierar!"
 
-#: templates/sitewide-search-admin.php:142
+#: templates/sitewide-search-admin.php:143
+msgid "Amount of posts per request:"
+msgstr "Antal inlägg per anrop:"
+
+#: templates/sitewide-search-admin.php:146
 msgid "Populate"
 msgstr "Kopiera"
 

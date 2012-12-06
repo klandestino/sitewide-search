@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-05 17:07+0100\n"
+"POT-Creation-Date: 2012-12-06 21:34+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -173,13 +173,19 @@ msgstr ""
 #: templates/sitewide-search-admin.php:140
 msgid ""
 "Depending on how many blogs and posts your site contains this can take a "
-"long time. Populate action is split into several requests of 100 posts each."
+"long time. Populate action is split into several requests of a specified "
+"amount of posts each. Choose a lower amount of posts per request if your "
+"server tend to fail during populate."
 msgstr ""
 
 #: templates/sitewide-search-admin.php:141
 msgid "Do not reload or leave this page when doing this!"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:142
+#: templates/sitewide-search-admin.php:143
+msgid "Amount of posts per request:"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:146
 msgid "Populate"
 msgstr ""
