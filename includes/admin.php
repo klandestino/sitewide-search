@@ -404,6 +404,10 @@ class Sitewide_Search_Admin {
 			}
 		}
 
+		// Clean output buffer so next the json_encode-line is the only 
+		// thing written.
+		ob_clean();
+
 		echo json_encode( $step );
 		// Exit when done and before wordpress or something else prints a zero.
 		exit;
