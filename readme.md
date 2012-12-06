@@ -18,6 +18,10 @@ This plugin can also be set to override search and browse queries so the results
 
 What post types and which taxnonomies to include is also editable with an easy admin interface.
 
+### More info, wiki and issue tracker
+
+https://github.com/klandestino/sitewide-search
+
 ### Available languages
 
 * English (built-in)
