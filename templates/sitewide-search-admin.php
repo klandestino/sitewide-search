@@ -137,8 +137,12 @@ $settings = Sitewide_Search_Admin::get_settings();
 								<input type="hidden" name="action" value="populate_archive" />
 								<p><?php _e( 'Populates the archive blog with posts from this network all blogs.', 'sitewide-search' ); ?></p>
 								<h4><?php _e( 'WARNING:', 'sitewide-search' ); ?></h4>
-								<p><?php _e( 'Depending on how many blogs and posts your site contains this can take a long time. Populate action is split into several requests of 100 posts each.', 'sitewide-search' ); ?></p>
+								<p><?php _e( 'Depending on how many blogs and posts your site contains this can take a long time. Populate action is split into several requests of a specified amount of posts each. Choose a lower amount of posts per request if your server tend to fail during populate.', 'sitewide-search' ); ?></p>
 								<p><?php _e( 'Do not reload or leave this page when doing this!', 'sitewide-search' ); ?></p>
+								<p>
+									<label for="sitewide-search-populate-chunk"><?php _e( 'Amount of posts per request:', 'sitewide-search' ); ?></label>
+									<input id="sitewide-search-populate-chunk" name="chunk" value="100" />
+								</p>
 								<p><input id="sitewide-search-populate-button" type="submit" class="button-primary" name="sitewide-search-populate" value="<?php echo esc_attr( __( 'Populate', 'sitewide-search' ) ); ?>" /></p>
 								<ul class="sitewide-search-populate-results"></ul>
 							</form>
