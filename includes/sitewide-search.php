@@ -190,46 +190,55 @@ class Sitewide_Search {
 					$copy->ping_status = 'closed';
 					// No comments
 					$copy->comment_status = 'closed';
+
 					$copy_id = 0;
 
-					// Switch to archive blog
-					switch_to_blog( $this->settings[ 'archive_blog_id' ] );
+					// Make post copy available for filter
+					$copy = apply_filters( 'sitewide_search_save_post', $copy, $post, $this->current_blog_id );
 
-					// Look for a already save copy of this post
-					$copy_id = $wpdb->get_var( $wpdb->prepare(
-						'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
-						$this->current_blog_id,
-						$post_id
-					) );
+					// If post copy filter returned false ...
+					if( is_object( $copy ) ) {
+						// Switch to archive blog
+						switch_to_blog( $this->settings[ 'archive_blog_id' ] );
 
-					// Save post copy in archive blog
-					if( $copy_id ) {
-						$copy->ID = $copy_id;
-						wp_update_post( ( array ) $copy );
-					} else {
-						unset( $copy->ID );
-						$copy_id = wp_insert_post( ( array ) $copy );
-					}
+						// Look for a already save copy of this post
+						$copy_id = $wpdb->get_var( $wpdb->prepare(
+							'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
+							$this->current_blog_id,
+							$post_id
+						) );
 
-					// Switch back to original blog
-					restore_current_blog();
-					$this->current_blog_id = 0;
-
-					// Get all post terms and save them with $this->save_taxonomy()
-					$terms = wp_get_object_terms( $post_id, $this->settings[ 'taxonomies' ] );
-					$tax = array();
-
-					foreach( $terms as $term ) {
-						if( ! is_array( $tax[ $term->taxonomy ] ) ) {
-							$tax[ $term->taxonomy ] = array( 'terms' => array(), 'term_ids' => array() );
+						// Save post copy in archive blog
+						if( $copy_id ) {
+							$copy->ID = $copy_id;
+							wp_update_post( ( array ) $copy );
+						} else {
+							unset( $copy->ID );
+							$copy_id = wp_insert_post( ( array ) $copy );
 						}
 
-						$tax[ $term->taxonomy ][ 'terms' ][] = $term->name;
-						$tax[ $term->taxonomy ][ 'term_ids' ][] = $term->term_id;
-					}
+						// Switch back to original blog
+						restore_current_blog();
+						$this->current_blog_id = 0;
 
-					foreach( $tax as $tax_name => $term ) {
-						$this->save_taxonomy( $post_id, $term[ 'terms' ], $terms[ 'term_ids' ], $tax_name );
+						// Get all post terms and save them with $this->save_taxonomy()
+						$terms = wp_get_object_terms( $post_id, $this->settings[ 'taxonomies' ] );
+						$tax = array();
+
+						foreach( $terms as $term ) {
+							if( ! is_array( $tax[ $term->taxonomy ] ) ) {
+								$tax[ $term->taxonomy ] = array( 'terms' => array(), 'term_ids' => array() );
+							}
+
+							$tax[ $term->taxonomy ][ 'terms' ][] = $term->name;
+							$tax[ $term->taxonomy ][ 'term_ids' ][] = $term->term_id;
+						}
+
+						foreach( $tax as $tax_name => $term ) {
+							$this->save_taxonomy( $post_id, $term[ 'terms' ], $terms[ 'term_ids' ], $tax_name );
+						}
+					} else {
+						$this->current_blog_id = 0;
 					}
 				}
 			}
@@ -273,19 +282,27 @@ class Sitewide_Search {
 					}
 
 					$this->current_blog_id = get_current_blog_id();
-					switch_to_blog( $this->settings[ 'archive_blog_id' ] );
 
-					$copy_id = $wpdb->get_var( $wpdb->prepare(
-						'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
-						$this->current_blog_id,
-						$post_id
-					) );
+					// Make terms available with filters
+					$terms = apply_filters( 'sitewide_search_save_taxonomy', $terms, $post, $this->current_blog_id );
 
-					if( $copy_id ) {
-						wp_set_object_terms( $copy_id, $terms, $taxonomy );
+					// Run is there's any terms
+					if( is_array( $terms ) ) {
+						switch_to_blog( $this->settings[ 'archive_blog_id' ] );
+
+						$copy_id = $wpdb->get_var( $wpdb->prepare(
+							'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
+							$this->current_blog_id,
+							$post_id
+						) );
+
+						if( $copy_id ) {
+							wp_set_object_terms( $copy_id, $terms, $taxonomy );
+						}
+
+						restore_current_blog();
 					}
 
-					restore_current_blog();
 					$this->current_blog_id = 0;
 				}
 			}
@@ -303,21 +320,27 @@ class Sitewide_Search {
 
 		if( $this->settings[ 'archive_blog_id' ] != get_current_blog_id() ) {
 			$this->current_blog_id = get_current_blog_id();
-			switch_to_blog( $this->settings[ 'archive_blog_id' ] );
 
-			$copies = $wpdb->get_results( $wpdb->prepare(
-				'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
-				$this->current_blog_id,
-				$post_id
-			), OBJECT );
+			$post_id = apply_filters( 'sitewide_search_delete_post', $post_id, $this->current_blog_id );
 
-			if( $copies ) {
-				foreach( $copies as $copy ) {
-					wp_delete_post( $copy->ID );
+			if( $post_id ) {
+				switch_to_blog( $this->settings[ 'archive_blog_id' ] );
+
+				$copies = $wpdb->get_results( $wpdb->prepare(
+					'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
+					$this->current_blog_id,
+					$post_id
+				), OBJECT );
+
+				if( $copies ) {
+					foreach( $copies as $copy ) {
+						wp_delete_post( $copy->ID );
+					}
 				}
+
+				restore_current_blog();
 			}
 
-			restore_current_blog();
 			$this->current_blog_id = 0;
 		}
 	}
