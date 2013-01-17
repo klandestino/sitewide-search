@@ -118,7 +118,7 @@ class Sitewide_Search {
 			$wpdb->set_blog_id( $this->settings[ 'archive_blog_id' ] );
 			$this->post_count = $wpdb->get_var( sprintf(
 				'SELECT COUNT( * ) FROM `%s` WHERE `post_status` = "publish"',
-				$wpdb->prepare( $wpdb->posts )
+				$wpdb->posts
 			) );
 			$wpdb->set_blog_id( $this->current_blog_id );
 		}
@@ -137,7 +137,7 @@ class Sitewide_Search {
 	public function save_post( $post_id, $post = null ) {
 		global $wpdb;
 
-		// Only if archive blog has been set and this blog is public
+		// Only if archive blog has been set, current blog hasn't changed to archive blog and this blog is public
 		if( $this->settings[ 'archive_blog_id' ] != $wpdb->blogid && ! $this->current_blog_id && get_blog_option( $wpdb->blogid, 'public', true ) ) {
 			// If not $post is defined, let's assume that the post has been posted here.
 			// Otherwise load it with get_post()
@@ -180,11 +180,10 @@ class Sitewide_Search {
 					$wpdb->set_blog_id( $this->settings[ 'archive_blog_id' ] );
 
 					// Look for a already save copy of this post
-					$copy_id = $wpdb->get_var( sprintf(
-						'SELECT `ID` FROM `%s` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
-						$wpdb->prepare( $wpdb->posts ),
-						$wpdb->prepare( $this->current_blog_id ),
-						$wpdb->prepare( $post_id )
+					$copy_id = $wpdb->get_var( $wpdb->prepare(
+						'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
+						$this->current_blog_id,
+						$post_id
 					) );
 
 					// Save post copy in archive blog
@@ -260,11 +259,10 @@ class Sitewide_Search {
 					$this->current_blog_id = $wpdb->blogid;
 					$wpdb->set_blog_id( $this->settings[ 'archive_blog_id' ] );
 
-					$copy_id = $wpdb->get_var( sprintf(
-						'SELECT `ID` FROM `%s` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
-						$wpdb->prepare( $wpdb->posts ),
-						$wpdb->prepare( $this->current_blog_id ),
-						$wpdb->prepare( $post_id )
+					$copy_id = $wpdb->get_var( $wpdb->prepare(
+						'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
+						$this->current_blog_id,
+						$post_id
 					) );
 
 					if( $copy_id ) {
@@ -291,11 +289,10 @@ class Sitewide_Search {
 			$this->current_blog_id = $wpdb->blogid;
 			$wpdb->set_blog_id( $this->settings[ 'archive_blog_id' ] );
 
-			$copies = $wpdb->get_results( sprintf(
-				'SELECT `ID` FROM `%s` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
-				$wpdb->prepare( $wpdb->posts ),
-				$wpdb->prepare( $this->current_blog_id ),
-				$wpdb->prepare( $post_id )
+			$copies = $wpdb->get_results( $wpdb->prepare(
+				'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
+				$this->current_blog_id,
+				$post_id
 			), OBJECT );
 
 			if( $copies ) {
@@ -337,10 +334,9 @@ class Sitewide_Search {
 			$this->current_blog_id = $wpdb->blogid;
 			$wpdb->set_blog_id( $this->settings[ 'archive_blog_id' ] );
 
-			$copies = $wpdb->get_results( sprintf(
-				'SELECT `ID` FROM `%s` WHERE `guid` REGEXP "[^0-9]*%d,[0-9]+"',
-				$wpdb->prepare( $wpdb->posts ),
-				$wpdb->prepare( $blog_id )
+			$copies = $wpdb->get_results( $wpdb->prepare(
+				'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` REGEXP "[^0-9]*%d,[0-9]+"',
+				$blog_id
 			), OBJECT );
 
 			if( $copies ) {
@@ -372,7 +368,7 @@ class Sitewide_Search {
 				$wpdb->term_taxonomy,
 				$wpdb->term_relationships
 			) as $table ) {
-				$wpdb->query( sprintf( 'TRUNCATE TABLE `%s`', $wpdb->prepare( $table ) ) );
+				$wpdb->query( sprintf( 'TRUNCATE TABLE `%s`', $table ) );
 			}
 
 			$wpdb->set_blog_id( $this->current_blog_id );
