@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-06 21:34+0100\n"
+"POT-Creation-Date: 2013-01-17 21:53+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,35 +17,8 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: includes/admin.php:128 templates/sitewide-search-admin.php:8
+#: templates/sitewide-search-admin.php:8 includes/admin.php:128
 msgid "Sitewide Search Settings"
-msgstr ""
-
-#: includes/admin.php:129
-msgid "Sitewide Search"
-msgstr ""
-
-#: includes/admin.php:179
-msgid "Settings updated."
-msgstr ""
-
-#: includes/admin.php:368
-#, php-format
-msgid "Copied %2$d of %3$d from %1$s."
-msgstr ""
-
-#: includes/admin.php:372
-#, php-format
-msgid "Blog %1$s done of %2$d left to do."
-msgstr ""
-
-#: includes/admin.php:376
-#, php-format
-msgid "Blog %1$s is not public, skipping. %2$d left to do."
-msgstr ""
-
-#: includes/admin.php:403
-msgid "No blogs found"
 msgstr ""
 
 #: templates/sitewide-search-admin.php:19
@@ -82,7 +55,7 @@ msgid "Choose taxonomies that will be copied into the archive blog"
 msgstr ""
 
 #: templates/sitewide-search-admin.php:82
-msgid "Override search"
+msgid "Sitewide search"
 msgstr ""
 
 #: templates/sitewide-search-admin.php:82
@@ -92,7 +65,7 @@ msgid ""
 msgstr ""
 
 #: templates/sitewide-search-admin.php:83
-msgid "Override archive"
+msgid "Sitewide archive"
 msgstr ""
 
 #: templates/sitewide-search-admin.php:83
@@ -102,7 +75,7 @@ msgid ""
 msgstr ""
 
 #: templates/sitewide-search-admin.php:84
-msgid "Override categories"
+msgid "Sitewide categories"
 msgstr ""
 
 #: templates/sitewide-search-admin.php:84
@@ -112,7 +85,7 @@ msgid ""
 msgstr ""
 
 #: templates/sitewide-search-admin.php:85
-msgid "Override tags"
+msgid "Sitewide tags"
 msgstr ""
 
 #: templates/sitewide-search-admin.php:85
@@ -122,7 +95,7 @@ msgid ""
 msgstr ""
 
 #: templates/sitewide-search-admin.php:86
-msgid "Override author"
+msgid "Sitewide author"
 msgstr ""
 
 #: templates/sitewide-search-admin.php:86
@@ -188,4 +161,31 @@ msgstr ""
 
 #: templates/sitewide-search-admin.php:146
 msgid "Populate"
+msgstr ""
+
+#: includes/admin.php:129
+msgid "Sitewide Search"
+msgstr ""
+
+#: includes/admin.php:179
+msgid "Settings updated."
+msgstr ""
+
+#: includes/admin.php:360
+#, php-format
+msgid "Copied %2$d of %3$d from %1$s."
+msgstr ""
+
+#: includes/admin.php:364
+#, php-format
+msgid "Blog %1$s done of %2$d left to do."
+msgstr ""
+
+#: includes/admin.php:368
+#, php-format
+msgid "Blog %1$s is not public, skipping. %2$d left to do."
+msgstr ""
+
+#: includes/admin.php:394
+msgid "No blogs found"
 msgstr ""

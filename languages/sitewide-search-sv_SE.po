@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-06 21:34+0100\n"
-"PO-Revision-Date: 2012-12-06 21:37+0100\n"
+"POT-Creation-Date: 2013-01-17 21:53+0100\n"
+"PO-Revision-Date: 2013-01-17 22:00+0100\n"
 "Last-Translator: spurge <olof@klandestino.se>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -16,37 +16,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: includes/admin.php:128
 #: templates/sitewide-search-admin.php:8
+#: includes/admin.php:128
 msgid "Sitewide Search Settings"
 msgstr "Sitewide Search Inställningar"
-
-#: includes/admin.php:129
-msgid "Sitewide Search"
-msgstr "Sitewide Search"
-
-#: includes/admin.php:179
-msgid "Settings updated."
-msgstr "Inställningarna uppdaterade."
-
-#: includes/admin.php:368
-#, php-format
-msgid "Copied %2$d of %3$d from %1$s."
-msgstr "Kopierade %2$d av %3$d från %1$s."
-
-#: includes/admin.php:372
-#, php-format
-msgid "Blog %1$s done of %2$d left to do."
-msgstr "Klar med %1$s - %2$d bloggar kvar."
-
-#: includes/admin.php:376
-#, php-format
-msgid "Blog %1$s is not public, skipping. %2$d left to do."
-msgstr "Bloggen %1$s är inte publik, hoppar över. %2$d bloggar kvar."
-
-#: includes/admin.php:403
-msgid "No blogs found"
-msgstr "Inga bloggar funna"
 
 #: templates/sitewide-search-admin.php:19
 msgid "Archive blog"
@@ -78,40 +51,40 @@ msgid "Choose taxonomies that will be copied into the archive blog"
 msgstr "Välj vilka taxonomier som kommer att kopieras till arkivbloggen"
 
 #: templates/sitewide-search-admin.php:82
-msgid "Override search"
-msgstr "Åsidosätt sök"
+msgid "Sitewide search"
+msgstr "Sitewide sök"
 
 #: templates/sitewide-search-admin.php:82
 msgid "Wherever visitors are searching, results will always be fetched from the archive."
 msgstr "Var än besökare söker efter inlägg kommer resultatet alltid att hämtas ifrån arkivbloggen."
 
 #: templates/sitewide-search-admin.php:83
-msgid "Override archive"
-msgstr "Åsidosätt arkiv"
+msgid "Sitewide archive"
+msgstr "Sitewide arkiv"
 
 #: templates/sitewide-search-admin.php:83
 msgid "Wherever visitors are browsing archives, results will always be fetched from the archive."
 msgstr "Var än besökare bläddrar i arkivet efter inlägg kommer resultatet alltid att hämtas ifrån arkivbloggen."
 
 #: templates/sitewide-search-admin.php:84
-msgid "Override categories"
-msgstr "Åsidosätt kategorier"
+msgid "Sitewide categories"
+msgstr "Sitewide kategorier"
 
 #: templates/sitewide-search-admin.php:84
 msgid "Wherever visitors are browsing posts by categories, results will always be fetched from the archive."
 msgstr "Var än besökare bläddrar inlägg efter kategori kommer resultatet alltid att hämtas ifrån arkivbloggen."
 
 #: templates/sitewide-search-admin.php:85
-msgid "Override tags"
-msgstr "Åsidosätt etiketter"
+msgid "Sitewide tags"
+msgstr "Sitewide etiketter"
 
 #: templates/sitewide-search-admin.php:85
 msgid "Wherever visitors are browsing posts by tags, results will always be fetched from the archive."
 msgstr "Var än besökare bläddrar inlägg efter etikett kommer resultatet alltid att hämtas ifrån arkivbloggen."
 
 #: templates/sitewide-search-admin.php:86
-msgid "Override author"
-msgstr "Åsidosätt författare"
+msgid "Sitewide author"
+msgstr "Sitewide författare"
 
 #: templates/sitewide-search-admin.php:86
 msgid "Wherever visitors are browsing posts by author, results will always be fetched from the archive."
@@ -172,3 +145,38 @@ msgstr "Antal inlägg per anrop:"
 msgid "Populate"
 msgstr "Kopiera"
 
+#: includes/admin.php:129
+msgid "Sitewide Search"
+msgstr "Sitewide Search"
+
+#: includes/admin.php:179
+msgid "Settings updated."
+msgstr "Inställningarna uppdaterade."
+
+#: includes/admin.php:360
+#, php-format
+msgid "Copied %2$d of %3$d from %1$s."
+msgstr "Kopierade %2$d av %3$d från %1$s."
+
+#: includes/admin.php:364
+#, php-format
+msgid "Blog %1$s done of %2$d left to do."
+msgstr "Klar med %1$s - %2$d bloggar kvar."
+
+#: includes/admin.php:368
+#, php-format
+msgid "Blog %1$s is not public, skipping. %2$d left to do."
+msgstr "Bloggen %1$s är inte publik, hoppar över. %2$d bloggar kvar."
+
+#: includes/admin.php:394
+msgid "No blogs found"
+msgstr "Inga bloggar funna"
+
+#~ msgid "Override search"
+#~ msgstr "Åsidosätt sök"
+
+#~ msgid "Override archive"
+#~ msgstr "Åsidosätt arkiv"
+
+#~ msgid "Override tags"
+#~ msgstr "Åsidosätt etiketter"
