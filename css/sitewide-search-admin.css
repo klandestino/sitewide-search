@@ -9,7 +9,7 @@
 input.working {
 	color: gray;
 	padding-right: 20px;
-	background: url('../../../../wp-admin/images/loading-publish.gif') right center no-repeat;
+	background: url('../../../../wp-admin/images/loading.gif') right center no-repeat;
 }
 
 .sitewide-search-admin td {
