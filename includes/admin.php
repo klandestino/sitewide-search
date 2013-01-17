@@ -206,16 +206,14 @@ class Sitewide_Search_Admin {
 		if( is_array( $query ) ) {
 			// Query is an array, let's assume it's a set of ids.
 			$query = $wpdb->get_results( sprintf(
-				'SELECT `blog_id`, `domain` FROM `%s` WHERE `blog_id` IN ( %s )',
-				$wpdb->prepare( $wpdb->blogs ),
-				$wpdb->prepare( implode( ',', $query ) )
+				'SELECT `blog_id`, `domain` FROM `' . $wpdb->blogs . '` WHERE `blog_id` IN ( %s )',
+				sprintf( '"%d"', implode( '","', $wpdb->_escape( $query ) ) )
 			), ARRAY_A );
 		} elseif( ! empty( $query ) ) {
 			// Query is a non-empty (and hopefully) string. Search blog by domain (name is not defined in wp_blogs-table
 			$query = $wpdb->get_results( sprintf(
-				'SELECT `blog_id`, `domain` FROM `%s` WHERE `domain` LIKE "%%%s%%"',
-				$wpdb->prepare( $wpdb->blogs ),
-				$wpdb->prepare( $query )
+				'SELECT `blog_id`, `domain` FROM `' . $wpdb->blogs . '` WHERE `domain` LIKE "%%%s%%"',
+				$wpdb->_escape( $query )
 			), ARRAY_A );
 		}
 
@@ -223,10 +221,9 @@ class Sitewide_Search_Admin {
 			$wpdb->set_blog_id( $blog[ 'blog_id' ] );
 
 			// Gather additional blog data in it's own option-table - wp_[blog id]_options
-			$subquery = $wpdb->get_results( sprintf(
-				'SELECT `option_name`, `option_value` FROM `%s` WHERE `option_name` IN ( "siteurl", "blogname", "blogdescription" )',
-				$wpdb->prepare( $wpdb->options )
-			), ARRAY_A );
+			$subquery = $wpdb->get_results(
+				'SELECT `option_name`, `option_value` FROM `' . $wpdb->options . '` WHERE `option_name` IN ( "siteurl", "blogname", "blogdescription" )',
+			ARRAY_A );
 
 			foreach( $subquery as $opt ) {
 				$blog[ $opt[ 'option_name' ] ] = esc_attr( $opt[ 'option_value' ] );
@@ -304,16 +301,14 @@ class Sitewide_Search_Admin {
 
 			if( ! $step[ 'blog' ] ) {
 				// No blog defined, start with main blog (id 1)
-				$step[ 'blog' ] = $wpdb->get_var( sprintf(
-					'SELECT `blog_id` FROM `%s` ORDER BY `blog_id` ASC LIMIT 0,1',
-					$wpdb->prepare( $wpdb->blogs )
-				) );
+				$step[ 'blog' ] = $wpdb->get_var(
+					'SELECT `blog_id` FROM `' . $wpdb->blogs . '` ORDER BY `blog_id` ASC LIMIT 0,1'
+				);
 			} else {
 				// Check requested blog
-				$step[ 'blog' ] = $wpdb->get_var( sprintf(
-					'SELECT `blog_id` FROM `%s` WHERE `blog_id` = "%d" LIMIT 0,1',
-					$wpdb->prepare( $wpdb->blogs ),
-					$wpdb->prepare( $step[ 'blog' ] )
+				$step[ 'blog' ] = $wpdb->get_var( $wpdb->prepare(
+					'SELECT `blog_id` FROM `' . $wpdb->blogs . '` WHERE `blog_id` = %d LIMIT 0,1',
+					$step[ 'blog' ]
 				) );
 			}
 
@@ -321,13 +316,12 @@ class Sitewide_Search_Admin {
 				$step[ 'post_done' ] = 0;
 				$step[ 'blog_name' ] = get_blog_option( $step[ 'blog' ], 'blogname' );
 
-				// If there's no blog count defined, get amount of blogs to show the admin
+				 // If there's no blog count defined, get amount of blogs to show the admin
 				// of what's left to do.
 				if( ! $step[ 'blog_count' ] ) {
-					$step[ 'blog_count' ] = $wpdb->get_var( sprintf(
-						'SELECT COUNT( * ) FROM `%s`',
-						$wpdb->prepare( $wpdb->blogs )
-					) );
+					$step[ 'blog_count' ] = $wpdb->get_var(
+						'SELECT COUNT( * ) FROM `' . $wpdb->blogs . '`'
+					);
 				}
 
 				// Only copy posts from public blogs
@@ -338,19 +332,17 @@ class Sitewide_Search_Admin {
 					// admin of what's left to do.
 					if( ! $step[ 'post_count' ] ) {
 						$step[ 'post_count' ] = $wpdb->get_var( sprintf(
-							'SELECT COUNT( * ) FROM `%s` WHERE `post_status` = "publish" AND `post_type` IN ( %s )',
-							$wpdb->prepare( $wpdb->posts ),
-							$wpdb->prepare( sprintf( '"%s"', implode( '","', $settings[ 'post_types' ] ) ) )
+							'SELECT COUNT( * ) FROM `' . $wpdb->posts . '` WHERE `post_status` = "publish" AND `post_type` IN ( %s )',
+							sprintf( '"%s"', implode( '","', $wpdb->_escape( $settings[ 'post_types' ] ) ) )
 						) );
 					}
 
 					// Do the post request
 					$posts = $wpdb->get_results( sprintf(
-						'SELECT `ID` FROM `%s` WHERE `ID` > "%d" AND `post_status` = "publish" AND `post_type` IN ( %s ) ORDER BY `ID` ASC LIMIT 0,%d',
-						$wpdb->prepare( $wpdb->posts ),
-						$wpdb->prepare( $step[ 'post' ] ),
-						$wpdb->prepare( sprintf( '"%s"', implode( '","', $settings[ 'post_types' ] ) ) ),
-						$wpdb->prepare( $step[ 'chunk' ] )
+						'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `ID` > %d AND `post_status` = "publish" AND `post_type` IN ( %s ) ORDER BY `ID` ASC LIMIT 0,%d',
+						$wpdb->_escape( $step[ 'post' ] ),
+						sprintf( '"%s"', implode( '","', $wpdb->_escape( $settings[ 'post_types' ] ) ) ),
+						$wpdb->_escape( $step[ 'chunk' ] )
 					), OBJECT );
 
 					if( $posts ) {
@@ -381,10 +373,9 @@ class Sitewide_Search_Admin {
 				if( ! $step[ 'post_done' ] ) {
 					$step[ 'post' ] = 0;
 					$step[ 'blog_count' ]--;
-					$step[ 'blog' ] = $wpdb->get_var( sprintf(
-						'SELECT `blog_id` FROM `%s` WHERE `blog_id` > "%d" ORDER BY `blog_id` ASC LIMIT 0,1',
-						$wpdb->prepare( $wpdb->blogs ),
-						$wpdb->prepare( $step[ 'blog' ] )
+					$step[ 'blog' ] = $wpdb->get_var( $wpdb->prepare(
+						'SELECT `blog_id` FROM `' . $wpdb->blogs . '` WHERE `blog_id` > %d ORDER BY `blog_id` ASC LIMIT 0,1',
+						$step[ 'blog' ]
 					) );
 				}
 

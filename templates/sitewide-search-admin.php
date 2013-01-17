@@ -79,11 +79,11 @@ $settings = Sitewide_Search_Admin::get_settings();
 					</tr>
 
 					<?php foreach( array(
-						'enable_search' => array( __( 'Override search', 'sitewide-search' ), __( 'Wherever visitors are searching, results will always be fetched from the archive.', 'sitewide-search' ) ),
-						'enable_archive' => array( __( 'Override archive', 'sitewide-search' ), __( 'Wherever visitors are browsing archives, results will always be fetched from the archive.', 'sitewide-search' ) ),
-						'enable_categories' => array( __( 'Override categories', 'sitewide-search' ), __( 'Wherever visitors are browsing posts by categories, results will always be fetched from the archive.', 'sitewide-search' ) ),
-						'enable_tags' => array( __( 'Override tags', 'sitewide-search' ), __( 'Wherever visitors are browsing posts by tags, results will always be fetched from the archive.', 'sitewide-search' ) ),
-						'enable_author' => array( __( 'Override author', 'sitewide-search' ), __( 'Wherever visitors are browsing posts by author, results will always be fetched from the archive.', 'sitewide-search' ) )
+						'enable_search' => array( __( 'Sitewide search', 'sitewide-search' ), __( 'Wherever visitors are searching, results will always be fetched from the archive.', 'sitewide-search' ) ),
+						'enable_archive' => array( __( 'Sitewide archive', 'sitewide-search' ), __( 'Wherever visitors are browsing archives, results will always be fetched from the archive.', 'sitewide-search' ) ),
+						'enable_categories' => array( __( 'Sitewide categories', 'sitewide-search' ), __( 'Wherever visitors are browsing posts by categories, results will always be fetched from the archive.', 'sitewide-search' ) ),
+						'enable_tags' => array( __( 'Sitewide tags', 'sitewide-search' ), __( 'Wherever visitors are browsing posts by tags, results will always be fetched from the archive.', 'sitewide-search' ) ),
+						'enable_author' => array( __( 'Sitewide author', 'sitewide-search' ), __( 'Wherever visitors are browsing posts by author, results will always be fetched from the archive.', 'sitewide-search' ) )
 					) as $override_name => $override ) : ?>
 						<tr>
 							<th scope="row">
