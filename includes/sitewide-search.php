@@ -426,8 +426,6 @@ class Sitewide_Search {
 			)
 			&& ! $is_forum
 		) {
-			global $wpdb;
-
 			if( $this->current_blog_id != get_current_blog_id() ) {
 				$this->current_blog_id = get_current_blog_id();
 				switch_to_blog( $this->settings[ 'archive_blog_id' ] );

@@ -48,7 +48,7 @@ class Sitewide_Search_Admin {
 	 * @return void
 	 */
 	static public function init() {
-		if( is_site_admin() ) {
+		if( is_super_admin() ) {
 			add_action( 'admin_init', array( Sitewide_Search_Admin, 'admin_page_save' ) );
 			add_action( 'network_admin_menu', array( Sitewide_Search_Admin, 'admin_menu' ) );
 		}
