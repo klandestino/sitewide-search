@@ -5,7 +5,7 @@ Sitewide Search
 * Tags: wordpressmu, sitewide, multisite, search, archive
 * Requires at least: WordPress 3.4.2
 * Tested up to: WordPress 3.5
-* Stable tag: 0.9.2
+* Stable tag: 0.9.3
 
 Creates sitewide searching and archive/category/tag/author browsing.
 
@@ -73,6 +73,11 @@ Return false if you don't want the post to get deleted.
 
 Changelog
 ---------
+
+### v0.9.3
+
+* Fixed issue with archive blog being present in populate posts action.
+* Fixed issue with loading indication in administration.
 
 ### v0.9.2
 
