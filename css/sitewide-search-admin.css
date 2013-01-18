@@ -12,6 +12,14 @@ input.working {
 	background: url('../../../../wp-admin/images/loading.gif') right center no-repeat;
 }
 
+input.button-primary.working,
+input.button-primary.working:focus,
+input.button-primary.working:hover {
+	color: gray;
+	padding-left: 24px;
+	background: url('../../../../wp-admin/images/loading.gif') 4px center no-repeat;
+}
+
 .sitewide-search-admin td {
 	vertical-align: top;
 }
