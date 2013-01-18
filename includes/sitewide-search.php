@@ -155,90 +155,92 @@ class Sitewide_Search {
 				$post = get_post( $post_id );
 			}
 
-			// Is this a post?
-			if( property_exists( $post, 'post_type' ) && property_exists( $post, 'post_status' ) ) {
-				if( property_exists( $post, 'guid' ) ) {
-					$guid = $post->guid;
-				} else {
-					$guid = '';
-				}
-
-				// Save only posts with post type defined in settings
-				// And only published posts
-				if(
-					in_array( $post->post_type, $this->settings[ 'post_types' ] )
-					&& $post->post_status == 'publish'
-					&& ! preg_match( '/^[^0-9]+[0-9]+,[0-9]+$/', $guid )
-				) {
-					$this->current_blog_id = get_current_blog_id();
-
-					// Clone $post so we don't mess around with wrong instance
-					$copy = clone $post;
-
-					if( property_exists( $post, 'ID' ) ) {
-						if( $post->ID ) {
-							$post_id = $post->ID;
-						}
+			if( is_object( $post ) ) {
+				// Is this a post?
+				if( property_exists( $post, 'post_type' ) && property_exists( $post, 'post_status' ) ) {
+					if( property_exists( $post, 'guid' ) ) {
+						$guid = $post->guid;
+					} else {
+						$guid = '';
 					}
 
-					// Saves a reference to the blog and the post with the following pattern:
-					// [blog id],[post id]
-					// Becouse it's saved in guid, wordpress will prepend this with a
-					// http:// or https://
-					$copy->guid = sprintf( '%d,%d', $this->current_blog_id, $copy->ID );
-					// No pinging
-					$copy->ping_status = 'closed';
-					// No comments
-					$copy->comment_status = 'closed';
+					// Save only posts with post type defined in settings
+					// And only published posts
+					if(
+						in_array( $post->post_type, $this->settings[ 'post_types' ] )
+						&& $post->post_status == 'publish'
+						&& ! preg_match( '/^[^0-9]+[0-9]+,[0-9]+$/', $guid )
+					) {
+						$this->current_blog_id = get_current_blog_id();
 
-					$copy_id = 0;
+						// Clone $post so we don't mess around with wrong instance
+						$copy = clone $post;
 
-					// Make post copy available for filter
-					$copy = apply_filters( 'sitewide_search_save_post', $copy, $post, $this->current_blog_id );
-
-					// If post copy filter returned false ...
-					if( is_object( $copy ) ) {
-						// Switch to archive blog
-						switch_to_blog( $this->settings[ 'archive_blog_id' ] );
-
-						// Look for a already save copy of this post
-						$copy_id = $wpdb->get_var( $wpdb->prepare(
-							'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
-							$this->current_blog_id,
-							$post_id
-						) );
-
-						// Save post copy in archive blog
-						if( $copy_id ) {
-							$copy->ID = $copy_id;
-							wp_update_post( ( array ) $copy );
-						} else {
-							unset( $copy->ID );
-							$copy_id = wp_insert_post( ( array ) $copy );
+						if( property_exists( $post, 'ID' ) ) {
+							if( $post->ID ) {
+								$post_id = $post->ID;
+							}
 						}
 
-						// Switch back to original blog
-						restore_current_blog();
-						$this->current_blog_id = 0;
+						// Saves a reference to the blog and the post with the following pattern:
+						// [blog id],[post id]
+						// Becouse it's saved in guid, wordpress will prepend this with a
+						// http:// or https://
+						$copy->guid = sprintf( '%d,%d', $this->current_blog_id, $copy->ID );
+						// No pinging
+						$copy->ping_status = 'closed';
+						// No comments
+						$copy->comment_status = 'closed';
 
-						// Get all post terms and save them with $this->save_taxonomy()
-						$terms = wp_get_object_terms( $post_id, $this->settings[ 'taxonomies' ] );
-						$tax = array();
+						$copy_id = 0;
 
-						foreach( $terms as $term ) {
-							if( ! is_array( $tax[ $term->taxonomy ] ) ) {
-								$tax[ $term->taxonomy ] = array( 'terms' => array(), 'term_ids' => array() );
+						// Make post copy available for filter
+						$copy = apply_filters( 'sitewide_search_save_post', $copy, $post, $this->current_blog_id );
+
+						// If post copy filter returned false ...
+						if( is_object( $copy ) ) {
+							// Switch to archive blog
+							switch_to_blog( $this->settings[ 'archive_blog_id' ] );
+
+							// Look for a already save copy of this post
+							$copy_id = $wpdb->get_var( $wpdb->prepare(
+								'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
+								$this->current_blog_id,
+								$post_id
+							) );
+
+							// Save post copy in archive blog
+							if( $copy_id ) {
+								$copy->ID = $copy_id;
+								wp_update_post( ( array ) $copy );
+							} else {
+								unset( $copy->ID );
+								$copy_id = wp_insert_post( ( array ) $copy );
 							}
 
-							$tax[ $term->taxonomy ][ 'terms' ][] = $term->name;
-							$tax[ $term->taxonomy ][ 'term_ids' ][] = $term->term_id;
-						}
+							// Switch back to original blog
+							restore_current_blog();
+							$this->current_blog_id = 0;
 
-						foreach( $tax as $tax_name => $term ) {
-							$this->save_taxonomy( $post_id, $term[ 'terms' ], $terms[ 'term_ids' ], $tax_name );
+							// Get all post terms and save them with $this->save_taxonomy()
+							$terms = wp_get_object_terms( $post_id, $this->settings[ 'taxonomies' ] );
+							$tax = array();
+
+							foreach( $terms as $term ) {
+								if( ! is_array( $tax[ $term->taxonomy ] ) ) {
+									$tax[ $term->taxonomy ] = array( 'terms' => array(), 'term_ids' => array() );
+								}
+
+								$tax[ $term->taxonomy ][ 'terms' ][] = $term->name;
+								$tax[ $term->taxonomy ][ 'term_ids' ][] = $term->term_id;
+							}
+
+							foreach( $tax as $tax_name => $term ) {
+								$this->save_taxonomy( $post_id, $term[ 'terms' ], $terms[ 'term_ids' ], $tax_name );
+							}
+						} else {
+							$this->current_blog_id = 0;
 						}
-					} else {
-						$this->current_blog_id = 0;
 					}
 				}
 			}
@@ -260,13 +262,13 @@ class Sitewide_Search {
 		if( $this->settings[ 'archive_blog_id' ] != get_current_blog_id() ) {
 			$post = get_post( $post_id, OBJECT );
 
-			if( property_exists( $post, 'guid' ) ) {
-				$guid = $post->guid;
-			} else {
-				$guid = '';
-			}
-
 			if( $post ) {
+				if( property_exists( $post, 'guid' ) ) {
+					$guid = $post->guid;
+				} else {
+					$guid = '';
+				}
+
 				if(
 					in_array( $post->post_type, $this->settings[ 'post_types' ] )
 					&& $post->post_status == 'publish'

@@ -301,9 +301,10 @@ class Sitewide_Search_Admin {
 
 			if( ! $step[ 'blog' ] ) {
 				// No blog defined, start with main blog (id 1)
-				$step[ 'blog' ] = $wpdb->get_var(
-					'SELECT `blog_id` FROM `' . $wpdb->blogs . '` ORDER BY `blog_id` ASC LIMIT 0,1'
-				);
+				$step[ 'blog' ] = $wpdb->get_var( $wpdb->prepare(
+					'SELECT `blog_id` FROM `' . $wpdb->blogs . '` WHERE NOT `blog_id` = %d ORDER BY `blog_id` ASC LIMIT 0,1',
+					$settings[ 'archive_blog_id' ]
+				) );
 			} else {
 				// Check requested blog
 				$step[ 'blog' ] = $wpdb->get_var( $wpdb->prepare(
@@ -316,7 +317,7 @@ class Sitewide_Search_Admin {
 				$step[ 'post_done' ] = 0;
 				$step[ 'blog_name' ] = get_blog_option( $step[ 'blog' ], 'blogname' );
 
-				 // If there's no blog count defined, get amount of blogs to show the admin
+				// If there's no blog count defined, get amount of blogs to show the admin
 				// of what's left to do.
 				if( ! $step[ 'blog_count' ] ) {
 					$step[ 'blog_count' ] = $wpdb->get_var(
@@ -374,8 +375,9 @@ class Sitewide_Search_Admin {
 					$step[ 'post' ] = 0;
 					$step[ 'blog_count' ]--;
 					$step[ 'blog' ] = $wpdb->get_var( $wpdb->prepare(
-						'SELECT `blog_id` FROM `' . $wpdb->blogs . '` WHERE `blog_id` > %d ORDER BY `blog_id` ASC LIMIT 0,1',
-						$step[ 'blog' ]
+						'SELECT `blog_id` FROM `' . $wpdb->blogs . '` WHERE `blog_id` > %d AND NOT `blog_id` = %d ORDER BY `blog_id` ASC LIMIT 0,1',
+						$step[ 'blog' ],
+						$settings[ 'archive_blog_id' ]
 					) );
 				}
 
