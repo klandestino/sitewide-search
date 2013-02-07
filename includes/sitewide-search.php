@@ -137,10 +137,9 @@ class Sitewide_Search {
 	 * @uses wp_update_post
 	 * @uses wp_inster_post
 	 * @param int $post_id
-	 * @param object $post optional, uses $_POST, $_GET and get_post() as fallbacks and in that order
 	 * @return void
 	 */
-	public function save_post( $post_id, $post = null ) {
+	public function save_post( $post_id ) {
 		global $wpdb;
 
 		// Only if archive blog has been set, current blog hasn't changed to archive blog and this blog is public
@@ -149,15 +148,7 @@ class Sitewide_Search {
 			&& ! $this->current_blog_id
 			&& get_blog_option( get_current_blog_id(), 'public', true )
 		) {
-			// If not $post is defined, let's assume that the post has been posted here.
-			// Otherwise load it with get_post()
-			if( ! is_object( $post ) && array_key_exists( 'post_title', $_POST ) ) {
-				$post = ( object ) $_POST;
-			} elseif( ! is_object( $post ) && array_key_exists( 'post_title', $_GET ) ) {
-				$post = ( object ) $_GET;
-			} elseif( ! is_object( $post ) ) {
-				$post = get_post( $post_id );
-			}
+			$post = get_post( $post_id );
 
 			if( is_object( $post ) ) {
 				// Is this a post?
@@ -176,13 +167,36 @@ class Sitewide_Search {
 						&& ! preg_match( '/^[^0-9]+[0-9]+,[0-9]+$/', $guid )
 					) {
 						$this->current_blog_id = get_current_blog_id();
+						$copy = new stdClass();
 
-						// Clone $post so we don't mess around with wrong instance
-						$copy = clone $post;
+						// Sanitize post input and copy fields
+						$fields = array(
+							'ID',
+							'post_author',
+							'post_date',
+							'post_date_gmt',
+							'post_content',
+							'post_content_filtered',
+							'post_title',
+							'post_excerpt',
+							'post_status',
+							'post_type',
+							'comment_status',
+							'ping_status',
+							'post_password',
+							'post_name',
+							'to_ping',
+							'pinged',
+							'post_modified',
+							'post_modified_gmt',
+							'post_parent',
+							'menu_order',
+							'guid'
+						);
 
-						if( property_exists( $post, 'ID' ) ) {
-							if( $post->ID ) {
-								$post_id = $post->ID;
+						foreach( $fields as $field ) {
+							if( property_exists( $post, $field ) ) {
+								$copy->$field = $post->$field;
 							}
 						}
 
@@ -212,14 +226,26 @@ class Sitewide_Search {
 								$this->current_blog_id,
 								$post_id
 							) );
+							unset( $copy->ID );
+
+							/*
+							 * Inserting data with wpdb instead of wp_insert/update_post.
+							 * In this way we won't get any trouble with data in
+							 * the wrong place when switching blog and running a
+							 * bunch of actions and filters.
+							 */
 
 							// Save post copy in archive blog
 							if( $copy_id ) {
-								$copy->ID = $copy_id;
-								wp_update_post( ( array ) $copy );
+								// The old way
+								//wp_update_post( ( array ) $copy );
+								// The new way
+								$wpdb->update( $wpdb->posts, ( array ) $copy, array( 'ID' => $copy_id ) );
 							} else {
-								unset( $copy->ID );
-								$copy_id = wp_insert_post( ( array ) $copy );
+								// The old way
+								//$copy_id = wp_insert_post( ( array ) $copy );
+								// The new way
+								$wpdb->insert( $wpdb->posts, ( array ) $copy );
 							}
 
 							// Switch back to original blog
