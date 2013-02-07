@@ -80,9 +80,9 @@ class Sitewide_Search {
 		if( $this->settings[ 'archive_blog_id' ] ) {
 			// Handle post saving
 			add_action( 'save_post', array( &$this, 'save_post' ), 1000 );
-			add_action( 'transition_post_status', array( &$this, 'save_post' ), 1000, 2 );
+			add_action( 'transition_post_status', array( &$this, 'save_post' ), 1000 );
 			// Handle taxonomy inserts
-			add_action( 'set_object_terms', array( &$this, 'save_taxonomy' ), 1000, 4 );
+			add_action( 'set_object_terms', array( &$this, 'save_taxonomy' ), 1000 );
 			// Handle meta data
 			add_action( 'added_post_meta', array( &$this, 'save_meta' ), 1000, 2 );
 			add_action( 'updated_post_meta', array( &$this, 'save_meta' ), 1000, 2 );
@@ -252,22 +252,9 @@ class Sitewide_Search {
 							restore_current_blog();
 							$this->current_blog_id = 0;
 
-							// Get all post terms and save them with $this->save_taxonomy()
-							$terms = wp_get_object_terms( $post_id, $this->settings[ 'taxonomies' ] );
-							$tax = array();
-
-							foreach( $terms as $term ) {
-								if( ! is_array( $tax[ $term->taxonomy ] ) ) {
-									$tax[ $term->taxonomy ] = array( 'terms' => array(), 'term_ids' => array() );
-								}
-
-								$tax[ $term->taxonomy ][ 'terms' ][] = $term->name;
-								$tax[ $term->taxonomy ][ 'term_ids' ][] = $term->term_id;
-							}
-
-							foreach( $tax as $tax_name => $term ) {
-								$this->save_taxonomy( $post_id, $term[ 'terms' ], $terms[ 'term_ids' ], $tax_name );
-							}
+							// Save taxonomies and metadata
+							$this->save_taxonomy( $post_id );
+							$this->save_meta( 0, $post_id );
 						} else {
 							$this->current_blog_id = 0;
 						}
@@ -279,14 +266,10 @@ class Sitewide_Search {
 
 	/**
 	 * Saves taxonomies related to post
-	 * @uses wp_set_object_terms
 	 * @param int $post_id
-	 * @param array $terms
-	 * @param array $term_ids
-	 * @param string $taxonomy
 	 * @return void
 	 */
-	public function save_taxonomy( $post_id, $terms, $term_ids, $taxonomy ) {
+	public function save_taxonomy( $post_id ) {
 		global $wpdb;
 
 		if( $this->settings[ 'archive_blog_id' ] != get_current_blog_id() ) {
@@ -302,39 +285,53 @@ class Sitewide_Search {
 				if(
 					in_array( $post->post_type, $this->settings[ 'post_types' ] )
 					&& $post->post_status == 'publish'
-					&& in_array( $taxonomy, $this->settings[ 'taxonomies' ] )
 					&& ! preg_match( '/^[^0-9]+[0-9]+,[0-9]+$/', $guid )
 				) {
-					foreach( $terms as $i => $term ) {
-						if( is_numeric( $term ) ) {
-							$term = get_term( $term_id, $taxonomy, OBJECT );
-							$terms[ $i ] = $term->name;
-							unset( $term );
-						}
-					}
 
-					$this->current_blog_id = get_current_blog_id();
+					// Get all post terms and save them with $this->save_taxonomy()
+					$terms = wp_get_object_terms( $post_id, $this->settings[ 'taxonomies' ] );
 
 					// Make terms available with filters
 					$terms = apply_filters( 'sitewide_search_save_taxonomy', $terms, $post, $this->current_blog_id );
 
-					// Run is there's any terms
-					if( is_array( $terms ) ) {
-						switch_to_blog( $this->settings[ 'archive_blog_id' ] );
+					$this->current_blog_id = get_current_blog_id();
+					switch_to_blog( $this->settings[ 'archive_blog_id' ] );
 
-						$copy_id = $wpdb->get_var( $wpdb->prepare(
-							'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
-							$this->current_blog_id,
-							$post_id
+					$copy_id = $wpdb->get_var( $wpdb->prepare(
+						'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
+						$this->current_blog_id,
+						$post_id
+					) );
+
+					if( $copy_id ) {
+
+						// Delete old term relationships
+						$wpdb->query( $wpdb->prepare(
+							'DELETE FROM `' . $wpdb->term_relationships . '` WHERE `object_id` = %d',
+							$copy_id
 						) );
 
-						if( $copy_id ) {
-							wp_set_object_terms( $copy_id, $terms, $taxonomy );
-						}
+						if( is_array( $terms ) ) {
+							// The old way
+							//wp_set_object_terms( $copy_id, $terms, $taxonomy );
+							// The new way ...
 
-						restore_current_blog();
+							foreach( $terms as $term ) {
+								$term_info = term_exists( $term->name, $term->taxonomy );
+
+								if( ! $term_info ) {
+									$term_info = wp_insert_term( $term->name, $term->taxonomy );
+								}
+
+								$wpdb->insert( $wpdb->term_relationships, array(
+									'object_id' => $copy_id,
+									'term_taxonomy_id' => $term_info[ 'term_taxonomy_id' ]
+								) );
+							}
+						}
 					}
 
+					restore_current_blog();
 					$this->current_blog_id = 0;
 				}
 			}
