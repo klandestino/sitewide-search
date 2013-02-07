@@ -65,6 +65,7 @@ class Sitewide_Search_Admin {
 			'archive_blog_id' => 0,
 			'post_types' => array( 'post' ),
 			'taxonomies' => array( 'post_tag', 'category' ),
+			'meta' => false,
 			'enable_search' => false,
 			'enable_archive' => false,
 			'enable_categories' => false,
@@ -161,7 +162,7 @@ class Sitewide_Search_Admin {
 			}
 
 			foreach( array(
-				'enable_search', 'enable_archive', 'enable_categories', 'enable_tags', 'enable_author'
+				'meta', 'enable_search', 'enable_archive', 'enable_categories', 'enable_tags', 'enable_author'
 			) as $override ) {
 				if( ! array_key_exists( $override, $_POST ) ) {
 					$settings[ $override ] = false;

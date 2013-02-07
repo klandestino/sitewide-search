@@ -78,6 +78,16 @@ $settings = Sitewide_Search_Admin::get_settings();
 						</td>
 					</tr>
 
+					<tr>
+						<th scope="row">
+							<label for="meta"><?php _e( 'Metadata', 'sitewide-search' ); ?></label><br />
+							<em><?php _e( 'Enable metadata to be copied', 'sitewide-search' ); ?></em>
+						</th>
+						<td>
+							<input type="checkbox" id="meta" name="meta" <?php if( $settings[ 'meta' ] ) echo 'checked="checked"'; ?> />
+						</td>
+					</tr>
+
 					<?php foreach( array(
 						'enable_search' => array( __( 'Sitewide search', 'sitewide-search' ), __( 'Wherever visitors are searching, results will always be fetched from the archive.', 'sitewide-search' ) ),
 						'enable_archive' => array( __( 'Sitewide archive', 'sitewide-search' ), __( 'Wherever visitors are browsing archives, results will always be fetched from the archive.', 'sitewide-search' ) ),

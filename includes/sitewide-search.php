@@ -83,6 +83,10 @@ class Sitewide_Search {
 			add_action( 'transition_post_status', array( &$this, 'save_post' ), 1000, 2 );
 			// Handle taxonomy inserts
 			add_action( 'set_object_terms', array( &$this, 'save_taxonomy' ), 1000, 4 );
+			// Handle meta data
+			add_action( 'added_post_meta', array( &$this, 'save_meta' ), 1000, 2 );
+			add_action( 'updated_post_meta', array( &$this, 'save_meta' ), 1000, 2 );
+			add_action( 'deleted_post_meta', array( &$this, 'save_meta' ), 1000, 2 );
 			// Handle post trashing and deleting
 			add_action( 'trash_post', array( &$this, 'delete_post' ), 1000 );
 			add_action( 'delete_post', array( &$this, 'delete_post' ), 1000 );
@@ -300,6 +304,85 @@ class Sitewide_Search {
 
 						if( $copy_id ) {
 							wp_set_object_terms( $copy_id, $terms, $taxonomy );
+						}
+
+						restore_current_blog();
+					}
+
+					$this->current_blog_id = 0;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Saves post meta
+	 * @param int|array $meta_id *Not used*
+	 * @param int $post_id
+	 * @return void
+	 */
+	public function save_meta( $meta_id, $post_id ) {
+		global $wpdb;
+
+		if( $this->settings[ 'archive_blog_id' ] != get_current_blog_id() ) {
+			$post = get_post( $post_id, OBJECT );
+
+			if( $post ) {
+				if( property_exists( $post, 'guid' ) ) {
+					$guid = $post->guid;
+				} else {
+					$guid = '';
+				}
+
+				if(
+					in_array( $post->post_type, $this->settings[ 'post_types' ] )
+					&& $post->post_status == 'publish'
+					&& ! preg_match( '/^[^0-9]+[0-9]+,[0-9]+$/', $guid )
+				) {
+					$this->current_blog_id = get_current_blog_id();
+
+					$meta = get_metadata( 'post', $post_id );
+
+					// Make meta available with filters
+					$meta = apply_filters( 'sitewide_search_save_meta', $meta, $post, $this->current_blog_id );
+
+					// Run is there's any meta
+					if( is_array( $meta ) ) {
+						switch_to_blog( $this->settings[ 'archive_blog_id' ] );
+
+						$copy_id = $wpdb->get_var( $wpdb->prepare(
+							'SELECT `ID` FROM `' . $wpdb->posts . '` WHERE `guid` REGEXP "[^0-9]*%d,%d"',
+							$this->current_blog_id,
+							$post_id
+						) );
+
+						if( $copy_id ) {
+							/*
+							 * Inserting meta with wpdb instead of add_metadata.
+							 * In this way we won't get any trouble with data in
+							 * the wrong place when switching blog and running a
+							 * bunch of actions and filters.
+							 */
+
+							$table = _get_meta_table( 'post' );
+							$column = esc_sql( 'post_id' );
+
+							// First delete all metadata
+							$wpdb->query( $wpdb->prepare(
+								'DELETE FROM `' . $table . '` WHERE `' . $column . '` = %d',
+								$copy_id
+							) );
+
+							// Then insert the originals
+							foreach( $meta as $key => $values ) {
+								foreach( $values as $val ) {
+									$wpdb->insert( $table, array(
+										$column => $copy_id,
+										'meta_key' => $key,
+										'meta_value' => $val
+									) );
+								}
+							}
 						}
 
 						restore_current_blog();
