@@ -7,7 +7,7 @@ Sitewide Search
 * Tested up to: WordPress 3.5.1
 * Stable tag: 0.9.5
 
-Creates sitewide searching and archive/category/tag/author browsing.
+Creates a multisite searching and archive/category/tag/author browsing.
 
 Description
 -----------
@@ -76,6 +76,7 @@ Changelog
 
 * Fixed issue with wrong blog id being saved during populate post action.
 * Changed the way posts and terms are copied so no other actions and filters whould be invoked.
+* Changed the way how posts are being fetched during searching and browsing.
 * Added support for copying post metadata.
 * Added support for fetching thumbnail from post original blog.
 
