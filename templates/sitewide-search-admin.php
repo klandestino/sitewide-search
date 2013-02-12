@@ -88,6 +88,13 @@ $settings = Sitewide_Search_Admin::get_settings();
 						</td>
 					</tr>
 
+					<tr>
+						<th scope="row" colspan="2">
+							<h4><?php _e( 'Sitewide browsing functions', 'sitewide-search' ); ?></h4>
+							<p><?php _e( 'Use these carefully. They may not work as perfect as you prefer and may reduce preformance.', 'sitewide-search' ); ?></p>
+						</th>
+					</tr>
+
 					<?php foreach( array(
 						'enable_search' => array( __( 'Sitewide search', 'sitewide-search' ), __( 'Wherever visitors are searching, results will always be fetched from the archive.', 'sitewide-search' ) ),
 						'enable_archive' => array( __( 'Sitewide archive', 'sitewide-search' ), __( 'Wherever visitors are browsing archives, results will always be fetched from the archive.', 'sitewide-search' ) ),
