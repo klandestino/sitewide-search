@@ -106,12 +106,6 @@ class Sitewide_Search {
 			// Handle post queries
 			// Adds post types and from what blog posts will be fetched
 			add_action( 'pre_get_posts', array( &$this, 'set_post_query' ) );
-			// Return original permalink for posts from archive
-			add_filter( 'post_link', array( &$this, 'get_original_permalink' ), 10, 2 );
-			//add_filter( 'get_permalink', array( &$this, 'get_original_permalink' ), 10, 2 );
-			// Set blog for original thumbnail for archive posts from correct blog
-			add_action( 'begin_fetch_post_thumbnail_html', array( &$this, 'switch_blog_for_thumbnail_begin' ), 10, 3 );
-			add_action( 'end_fetch_post_thumbnail_html', array( &$this, 'switch_blog_for_thumbnail_end' ), 10, 3 );
 		}
 	}
 
@@ -593,6 +587,10 @@ class Sitewide_Search {
 			// don't mess up with the headers and so.
 			add_filter( 'posts_results', array( &$this, 'after_set_post_query' ) );
 
+			// Add actions for blog scope during looping
+			add_action( 'loop_start', array( &$this, 'loop_start' ), 10 );
+			add_action( 'loop_end', array( &$this, 'loop_end' ), 10 );
+
 			return $query;
 		}
 	}
@@ -622,61 +620,69 @@ class Sitewide_Search {
 	}
 
 	/**
-	 * Get original permalink from correct blog
-	 * @param string $permalink
-	 * @param object $post
-	 * return string
+	 * Switches to archive blog and adds a the_post action
+	 * @param object $query
+	 * @return void
 	 */
-	public function get_original_permalink( $permalink, $post ) {
-		if( property_exists( $post, 'blog_id' ) ) {
-			if( intval( $post->blog_id ) != get_current_blog_id() ) {
-				return get_blog_permalink( $post->blog_id, $post->ID );
-			}
-		} elseif( preg_match( '/[^0-9]*([0-9]+),([0-9]+)/', $post->guid, $guid ) ) {
-			if( intval( $guid[ 1 ] ) != get_current_blog_id() ) {
-				return get_blog_permalink( $guid[ 1 ], $guid[ 2 ] );
-			}
-		}
+	public function loop_start( $query ) {
+		remove_action( 'loop_start', array( &$this, 'loop_start' ) );
 
-		return $permalink;
-	}
-
-	/**
-	 * Switches blog if the post's blog is somewhere else
-	 * @param int $post_id
-	 * @param int $thumb_id
-	 * @param string $size
-	 * return void
-	 */
-	public function switch_blog_for_thumbnail_begin( $post_id, $thumb_id, $size ) {
-		if( $this->settings[ 'archive_blog_id' ] ) {
+		if( $this->settings[ 'archive_blog_id' ] && ! $this->current_blog_id ) {
+			$this->current_blog_id = get_current_blog_id();
 			switch_to_blog( $this->settings[ 'archive_blog_id' ] );
-			$this->thumbnai_blog_id = 0;
-			$post = get_post( $post_id );
+			//global $wpdb;
+			//$wpdb->set_blog_id( $this->settings[ 'archive_blog_id' ] );
+		}
 
-			if( preg_match( '/[^0-9]*([0-9]+),([0-9]+)/', $post->guid, $guid ) ) {
-				$this->thumbnail_blog_id = $guid[ 1 ];
-			}
+		add_action( 'the_post', array( &$this, 'the_post' ), 10 );
+	}
 
+	/**
+	 * Restores to current blog
+	 * @param object $query
+	 * return void
+	 */
+	public function loop_end( $query ) {
+		remove_action( 'loop_end', array( &$this, 'loop_end' ) );
+		remove_action( 'the_post', array( &$this, 'the_post' ) );
+
+		if( $this->current_blog_id ) {
+			//global $wpdb;
+			//$wpdb->set_blog_id( $this->current_blog_id );
+			$this->current_blog_id = 0;
 			restore_current_blog();
-
-			if( $this->thumbnail_blog_id ) {
-				switch_to_blog( $this->thumbnail_blog_id );
-			}
 		}
 	}
 
 	/**
-	 * Switches blog back to current blog if the post's blog is somewhere else
-	 * @param int $post_id
-	 * @param int $thumb_id
-	 * @param string $size
-	 * return void
+	 * Switches to post's original blog or restores to current blog
+	 * @param object $post
+	 * @return void
 	 */
-	public function switch_blog_for_thumbnail_end( $post_id, $thumb_id, $size ) {
-		if( $this->thumbnail_blog_id ) {
-			restore_current_blog();
-			$this->thumbnail_blog_id = 0;
+	public function the_post( $post ) {
+		if( is_object( $post ) ) {
+			$blog_id = 0;
+			$post_id = 0;
+
+			if( property_exists( $post, 'blog_id' ) ) {
+				$blog_id = $post->blog_id;
+				$post_id = $post->ID;
+			} elseif( preg_match( '/[^0-9]*([0-9]+),([0-9]+)/', $post->guid, $guid ) ) {
+				$blog_id = $guid[ 1 ];
+				$post_id = $guid[ 2 ];
+			}
+
+			//global $wpdb;
+
+			if( $blog_id && $this->current_blog_id && $blog_id == $this->current_blog_id ) {
+				//$wpdb->set_blog_id( $this->current_blog_id );
+				$this->current_blog_id = 0;
+				restore_current_blog();
+			} elseif( $blog_id ) {
+				$this->current_blog_id = get_current_blog_id();
+				switch_to_blog( $blog_id );
+				//$wpdb->set_blog_id( $blog_id );
+			}
 		}
 	}
 
