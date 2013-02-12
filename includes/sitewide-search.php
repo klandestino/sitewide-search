@@ -106,6 +106,9 @@ class Sitewide_Search {
 			// Handle post queries
 			// Adds post types and from what blog posts will be fetched
 			add_action( 'pre_get_posts', array( &$this, 'set_post_query' ) );
+
+			// Correct permalinks if they're fetched from the archive
+			add_filter( 'post_link', array( &$this, 'get_original_permalink' ), 10, 2 );
 		}
 	}
 
@@ -684,6 +687,39 @@ class Sitewide_Search {
 				//$wpdb->set_blog_id( $blog_id );
 			}
 		}
+	}
+
+	/**
+	 * Get original permalink from correct blog
+	 * @param string $permalink
+	 * @param object|int $post
+	 * return string
+	 */
+	public function get_original_permalink( $permalink, $post ) {
+		if( ! $this->current_blog_id ) {
+			$blog_id = 0;
+			$post_id = 0;
+
+			if( ! is_object( $post ) ) {
+				$post = get_post( $post );
+			}
+
+			if( property_exists( $post, 'blog_id' ) ) {
+				$blog_id = $post->blog_id;
+				$post_id = $post->ID;
+			} elseif( preg_match( '/[^0-9]*([0-9]+),([0-9]+)/', $post->guid, $guid ) ) {
+				$blog_id = $guid[ 1 ];
+				$post_id = $guid[ 2 ];
+			}
+
+			if( $blog_id && $blog_id ) {
+				remove_filter( 'post_link', array( &$this, 'get_original_permalink' ) );
+				$permalink = get_blog_permalink( $blog_id, $post_id );
+				add_filter( 'post_link', array( &$this, 'get_original_permalink' ), 10, 2 );
+			}
+		}
+
+		return $permalink;
 	}
 
 }
