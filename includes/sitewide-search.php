@@ -288,7 +288,6 @@ class Sitewide_Search {
 					&& ! preg_match( '/^[^0-9]+[0-9]+,[0-9]+$/', $guid )
 				) {
 
-					// Get all post terms and save them with $this->save_taxonomy()
 					$terms = wp_get_object_terms( $post_id, $this->settings[ 'taxonomies' ] );
 
 					// Make terms available with filters
@@ -304,7 +303,6 @@ class Sitewide_Search {
 					) );
 
 					if( $copy_id ) {
-
 						// Delete old term relationships
 						$wpdb->query( $wpdb->prepare(
 							'DELETE FROM `' . $wpdb->term_relationships . '` WHERE `object_id` = %d',
@@ -347,7 +345,10 @@ class Sitewide_Search {
 	public function save_meta( $meta_id, $post_id ) {
 		global $wpdb;
 
-		if( $this->settings[ 'archive_blog_id' ] != get_current_blog_id() ) {
+		if(
+			$this->settings[ 'archive_blog_id' ] != get_current_blog_id()
+			&& $this->settings[ 'meta' ]
+		) {
 			$post = get_post( $post_id, OBJECT );
 
 			if( $post ) {
