@@ -4,8 +4,8 @@ Sitewide Search
 * Contributors: spurge, lakrisgubben, alfreddatakillen
 * Tags: wordpressmu, sitewide, multisite, search, archive
 * Requires at least: WordPress 3.4.2
-* Tested up to: WordPress 3.5
-* Stable tag: 0.9.3
+* Tested up to: WordPress 3.5.1
+* Stable tag: 0.9.5
 
 Creates sitewide searching and archive/category/tag/author browsing.
 
@@ -36,14 +36,12 @@ Then create a blog you wish to save all the posts to. Select the blog in the adm
 
 All the settings is available in the network administration settings pages.
 
-Docs
-----
-
-### Filters
+Filters
+-------
 
 You can filter posts and taxonomies during saving and deleting.
 
-#### sitewide_search_save_post
+### sitewide_search_save_post
 
 Is triggered when a post is about to be copied into the archive blog.
 Filters the post copy. Gives you 3 arguments: object `$copy`, object
@@ -53,7 +51,7 @@ Return the copy as an object if you want it modified.
 
 Return false if you don't want the post to get copied.
 
-#### sitewide_search_save_taxonomy
+### sitewide_search_save_taxonomy
 
 Is triggered when a posts taxonomy terms are about to be copied into the
 archive blog. Filters the terms. Gives you 3 arguments: array `$terms`,
@@ -63,7 +61,7 @@ Return the terms as an array if you want it modified.
 
 Return false if you don't want any terms to get copied.
 
-#### sitewide_search_delete_post
+### sitewide_search_delete_post
 
 Is triggered then a post is about to be deleted from the archive blog.
 Filters the post id. Gives you 2 arguments: int `$post_id` and int
@@ -73,6 +71,13 @@ Return false if you don't want the post to get deleted.
 
 Changelog
 ---------
+
+### v0.9.5
+
+* Fixed issue with wrong blog id being saved during populate post action.
+* Changed the way posts and terms are copied so no other actions and filters whould be invoked.
+* Added support for copying post metadata.
+* Added support for fetching thumbnail from post original blog.
 
 ### v0.9.3
 
