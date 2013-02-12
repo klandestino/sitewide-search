@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-17 21:53+0100\n"
-"PO-Revision-Date: 2013-01-17 22:00+0100\n"
+"POT-Creation-Date: 2013-02-12 15:07+0100\n"
+"PO-Revision-Date: 2013-02-12 15:08+0100\n"
 "Last-Translator: spurge <olof@klandestino.se>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -16,10 +16,37 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: includes/admin.php:129
 #: templates/sitewide-search-admin.php:8
-#: includes/admin.php:128
 msgid "Sitewide Search Settings"
 msgstr "Sitewide Search Inställningar"
+
+#: includes/admin.php:130
+msgid "Sitewide Search"
+msgstr "Sitewide Search"
+
+#: includes/admin.php:180
+msgid "Settings updated."
+msgstr "Inställningarna uppdaterade."
+
+#: includes/admin.php:363
+#, php-format
+msgid "Copied %2$d of %3$d from %1$s."
+msgstr "Kopierade %2$d av %3$d från %1$s."
+
+#: includes/admin.php:367
+#, php-format
+msgid "Blog %1$s done of %2$d left to do."
+msgstr "Klar med %1$s - %2$d bloggar kvar."
+
+#: includes/admin.php:371
+#, php-format
+msgid "Blog %1$s is not public, skipping. %2$d left to do."
+msgstr "Bloggen %1$s är inte publik, hoppar över. %2$d bloggar kvar."
+
+#: includes/admin.php:398
+msgid "No blogs found"
+msgstr "Inga bloggar funna"
 
 #: templates/sitewide-search-admin.php:19
 msgid "Archive blog"
@@ -50,127 +77,108 @@ msgstr "Taxonomier"
 msgid "Choose taxonomies that will be copied into the archive blog"
 msgstr "Välj vilka taxonomier som kommer att kopieras till arkivbloggen"
 
-#: templates/sitewide-search-admin.php:82
+#: templates/sitewide-search-admin.php:83
+msgid "Metadata"
+msgstr "Metadata"
+
+#: templates/sitewide-search-admin.php:84
+msgid "Enable metadata to be copied"
+msgstr "Kopiera metadata"
+
+#: templates/sitewide-search-admin.php:92
 msgid "Sitewide search"
 msgstr "Sitewide sök"
 
-#: templates/sitewide-search-admin.php:82
+#: templates/sitewide-search-admin.php:92
 msgid "Wherever visitors are searching, results will always be fetched from the archive."
 msgstr "Var än besökare söker efter inlägg kommer resultatet alltid att hämtas ifrån arkivbloggen."
 
-#: templates/sitewide-search-admin.php:83
+#: templates/sitewide-search-admin.php:93
 msgid "Sitewide archive"
 msgstr "Sitewide arkiv"
 
-#: templates/sitewide-search-admin.php:83
+#: templates/sitewide-search-admin.php:93
 msgid "Wherever visitors are browsing archives, results will always be fetched from the archive."
 msgstr "Var än besökare bläddrar i arkivet efter inlägg kommer resultatet alltid att hämtas ifrån arkivbloggen."
 
-#: templates/sitewide-search-admin.php:84
+#: templates/sitewide-search-admin.php:94
 msgid "Sitewide categories"
 msgstr "Sitewide kategorier"
 
-#: templates/sitewide-search-admin.php:84
+#: templates/sitewide-search-admin.php:94
 msgid "Wherever visitors are browsing posts by categories, results will always be fetched from the archive."
 msgstr "Var än besökare bläddrar inlägg efter kategori kommer resultatet alltid att hämtas ifrån arkivbloggen."
 
-#: templates/sitewide-search-admin.php:85
+#: templates/sitewide-search-admin.php:95
 msgid "Sitewide tags"
 msgstr "Sitewide etiketter"
 
-#: templates/sitewide-search-admin.php:85
+#: templates/sitewide-search-admin.php:95
 msgid "Wherever visitors are browsing posts by tags, results will always be fetched from the archive."
 msgstr "Var än besökare bläddrar inlägg efter etikett kommer resultatet alltid att hämtas ifrån arkivbloggen."
 
-#: templates/sitewide-search-admin.php:86
+#: templates/sitewide-search-admin.php:96
 msgid "Sitewide author"
 msgstr "Sitewide författare"
 
-#: templates/sitewide-search-admin.php:86
+#: templates/sitewide-search-admin.php:96
 msgid "Wherever visitors are browsing posts by author, results will always be fetched from the archive."
 msgstr "Var än besökare bläddrar inlägg efter författare kommer resultatet alltid att hämtas ifrån arkivbloggen."
 
-#: templates/sitewide-search-admin.php:102
+#: templates/sitewide-search-admin.php:112
 msgid "Save"
 msgstr "Spara"
 
-#: templates/sitewide-search-admin.php:112
+#: templates/sitewide-search-admin.php:122
 msgid "Reset archive blog"
 msgstr "Nollställ arkivblogg"
 
-#: templates/sitewide-search-admin.php:119
+#: templates/sitewide-search-admin.php:129
 #, php-format
 msgid "You're about to remove all %d posts. Do you want to continue?"
 msgstr "Du kommer ta bort alla %d inlägg. Vill du fortsätta?"
 
-#: templates/sitewide-search-admin.php:120
+#: templates/sitewide-search-admin.php:130
 msgid "Remove all current copies from the archive blog."
 msgstr "Ta bort alla kopior från arkivbloggen."
 
-#: templates/sitewide-search-admin.php:121
-#: templates/sitewide-search-admin.php:139
+#: templates/sitewide-search-admin.php:131
+#: templates/sitewide-search-admin.php:149
 msgid "WARNING:"
 msgstr "VARNING:"
 
-#: templates/sitewide-search-admin.php:122
+#: templates/sitewide-search-admin.php:132
 msgid "Think twice before you do this, This is not undoable!"
 msgstr "Tänk efter noga innan du gör detta. Detta kan du inte ångra!"
 
-#: templates/sitewide-search-admin.php:123
+#: templates/sitewide-search-admin.php:133
 #, php-format
 msgid "Remove all %d posts"
 msgstr "Ta bort alla %d inlägg"
 
-#: templates/sitewide-search-admin.php:131
+#: templates/sitewide-search-admin.php:141
 msgid "Populate archive blog"
 msgstr "Kopiera poster till arkivbloggen"
 
-#: templates/sitewide-search-admin.php:138
+#: templates/sitewide-search-admin.php:148
 msgid "Populates the archive blog with posts from this network all blogs."
 msgstr "Kopierar inlägg från nätverkets alla bloggar till arkivbloggen."
 
-#: templates/sitewide-search-admin.php:140
+#: templates/sitewide-search-admin.php:150
 msgid "Depending on how many blogs and posts your site contains this can take a long time. Populate action is split into several requests of a specified amount of posts each. Choose a lower amount of posts per request if your server tend to fail during populate."
 msgstr "Beroende på hur många bloggar och poster den här webbplatsen innehåller, så kan detta ta lång tid. Kopieringen är uppdelad i ett inställningsbart antal inlägg per anrop. Välj ett lägre antal inlägg per anrop ifall din server tenderar att lyckas avsluta kopieringen."
 
-#: templates/sitewide-search-admin.php:141
+#: templates/sitewide-search-admin.php:151
 msgid "Do not reload or leave this page when doing this!"
 msgstr "Ladda inte om eller lämna denna sida när du kopierar!"
 
-#: templates/sitewide-search-admin.php:143
+#: templates/sitewide-search-admin.php:153
 msgid "Amount of posts per request:"
 msgstr "Antal inlägg per anrop:"
 
-#: templates/sitewide-search-admin.php:146
+#: templates/sitewide-search-admin.php:156
 msgid "Populate"
 msgstr "Kopiera"
-
-#: includes/admin.php:129
-msgid "Sitewide Search"
-msgstr "Sitewide Search"
-
-#: includes/admin.php:179
-msgid "Settings updated."
-msgstr "Inställningarna uppdaterade."
-
-#: includes/admin.php:360
-#, php-format
-msgid "Copied %2$d of %3$d from %1$s."
-msgstr "Kopierade %2$d av %3$d från %1$s."
-
-#: includes/admin.php:364
-#, php-format
-msgid "Blog %1$s done of %2$d left to do."
-msgstr "Klar med %1$s - %2$d bloggar kvar."
-
-#: includes/admin.php:368
-#, php-format
-msgid "Blog %1$s is not public, skipping. %2$d left to do."
-msgstr "Bloggen %1$s är inte publik, hoppar över. %2$d bloggar kvar."
-
-#: includes/admin.php:394
-msgid "No blogs found"
-msgstr "Inga bloggar funna"
 
 #~ msgid "Override search"
 #~ msgstr "Åsidosätt sök"

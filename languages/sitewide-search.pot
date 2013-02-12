@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-17 21:53+0100\n"
+"POT-Creation-Date: 2013-02-12 15:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,35 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: templates/sitewide-search-admin.php:8 includes/admin.php:128
+#: includes/admin.php:129 templates/sitewide-search-admin.php:8
 msgid "Sitewide Search Settings"
+msgstr ""
+
+#: includes/admin.php:130
+msgid "Sitewide Search"
+msgstr ""
+
+#: includes/admin.php:180
+msgid "Settings updated."
+msgstr ""
+
+#: includes/admin.php:363
+#, php-format
+msgid "Copied %2$d of %3$d from %1$s."
+msgstr ""
+
+#: includes/admin.php:367
+#, php-format
+msgid "Blog %1$s done of %2$d left to do."
+msgstr ""
+
+#: includes/admin.php:371
+#, php-format
+msgid "Blog %1$s is not public, skipping. %2$d left to do."
+msgstr ""
+
+#: includes/admin.php:398
+msgid "No blogs found"
 msgstr ""
 
 #: templates/sitewide-search-admin.php:19
@@ -54,96 +81,104 @@ msgstr ""
 msgid "Choose taxonomies that will be copied into the archive blog"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:82
+#: templates/sitewide-search-admin.php:83
+msgid "Metadata"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:84
+msgid "Enable metadata to be copied"
+msgstr ""
+
+#: templates/sitewide-search-admin.php:92
 msgid "Sitewide search"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:82
+#: templates/sitewide-search-admin.php:92
 msgid ""
 "Wherever visitors are searching, results will always be fetched from the "
 "archive."
 msgstr ""
 
-#: templates/sitewide-search-admin.php:83
+#: templates/sitewide-search-admin.php:93
 msgid "Sitewide archive"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:83
+#: templates/sitewide-search-admin.php:93
 msgid ""
 "Wherever visitors are browsing archives, results will always be fetched from "
 "the archive."
 msgstr ""
 
-#: templates/sitewide-search-admin.php:84
+#: templates/sitewide-search-admin.php:94
 msgid "Sitewide categories"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:84
+#: templates/sitewide-search-admin.php:94
 msgid ""
 "Wherever visitors are browsing posts by categories, results will always be "
 "fetched from the archive."
 msgstr ""
 
-#: templates/sitewide-search-admin.php:85
+#: templates/sitewide-search-admin.php:95
 msgid "Sitewide tags"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:85
+#: templates/sitewide-search-admin.php:95
 msgid ""
 "Wherever visitors are browsing posts by tags, results will always be fetched "
 "from the archive."
 msgstr ""
 
-#: templates/sitewide-search-admin.php:86
+#: templates/sitewide-search-admin.php:96
 msgid "Sitewide author"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:86
+#: templates/sitewide-search-admin.php:96
 msgid ""
 "Wherever visitors are browsing posts by author, results will always be "
 "fetched from the archive."
 msgstr ""
 
-#: templates/sitewide-search-admin.php:102
+#: templates/sitewide-search-admin.php:112
 msgid "Save"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:112
+#: templates/sitewide-search-admin.php:122
 msgid "Reset archive blog"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:119
+#: templates/sitewide-search-admin.php:129
 #, php-format
 msgid "You're about to remove all %d posts. Do you want to continue?"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:120
+#: templates/sitewide-search-admin.php:130
 msgid "Remove all current copies from the archive blog."
 msgstr ""
 
-#: templates/sitewide-search-admin.php:121
-#: templates/sitewide-search-admin.php:139
+#: templates/sitewide-search-admin.php:131
+#: templates/sitewide-search-admin.php:149
 msgid "WARNING:"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:122
+#: templates/sitewide-search-admin.php:132
 msgid "Think twice before you do this, This is not undoable!"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:123
+#: templates/sitewide-search-admin.php:133
 #, php-format
 msgid "Remove all %d posts"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:131
+#: templates/sitewide-search-admin.php:141
 msgid "Populate archive blog"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:138
+#: templates/sitewide-search-admin.php:148
 msgid "Populates the archive blog with posts from this network all blogs."
 msgstr ""
 
-#: templates/sitewide-search-admin.php:140
+#: templates/sitewide-search-admin.php:150
 msgid ""
 "Depending on how many blogs and posts your site contains this can take a "
 "long time. Populate action is split into several requests of a specified "
@@ -151,41 +186,14 @@ msgid ""
 "server tend to fail during populate."
 msgstr ""
 
-#: templates/sitewide-search-admin.php:141
+#: templates/sitewide-search-admin.php:151
 msgid "Do not reload or leave this page when doing this!"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:143
+#: templates/sitewide-search-admin.php:153
 msgid "Amount of posts per request:"
 msgstr ""
 
-#: templates/sitewide-search-admin.php:146
+#: templates/sitewide-search-admin.php:156
 msgid "Populate"
-msgstr ""
-
-#: includes/admin.php:129
-msgid "Sitewide Search"
-msgstr ""
-
-#: includes/admin.php:179
-msgid "Settings updated."
-msgstr ""
-
-#: includes/admin.php:360
-#, php-format
-msgid "Copied %2$d of %3$d from %1$s."
-msgstr ""
-
-#: includes/admin.php:364
-#, php-format
-msgid "Blog %1$s done of %2$d left to do."
-msgstr ""
-
-#: includes/admin.php:368
-#, php-format
-msgid "Blog %1$s is not public, skipping. %2$d left to do."
-msgstr ""
-
-#: includes/admin.php:394
-msgid "No blogs found"
 msgstr ""
