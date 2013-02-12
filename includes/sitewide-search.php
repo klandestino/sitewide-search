@@ -62,6 +62,11 @@ class Sitewide_Search {
 	public $current_blog_id = 0;
 
 	/**
+	 * Holder for which blog thumbnail will be fetched from
+	 */
+	public $thumbnail_blog_id = 0;
+
+	/**
 	 * Constructor
 	 */
 	function __construct() {
@@ -104,6 +109,9 @@ class Sitewide_Search {
 			// Return original permalink for posts from archive
 			add_filter( 'post_link', array( &$this, 'get_original_permalink' ), 10, 2 );
 			//add_filter( 'get_permalink', array( &$this, 'get_original_permalink' ), 10, 2 );
+			// Set blog for original thumbnail for archive posts from correct blog
+			add_action( 'begin_fetch_post_thumbnail_html', array( &$this, 'switch_blog_for_thumbnail_begin' ), 10, 3 );
+			add_action( 'end_fetch_post_thumbnail_html', array( &$this, 'switch_blog_for_thumbnail_end' ), 10, 3 );
 		}
 	}
 
@@ -314,6 +322,9 @@ class Sitewide_Search {
 							//wp_set_object_terms( $copy_id, $terms, $taxonomy );
 							// The new way ...
 
+							// Used to recount term count
+							$recount = array();
+
 							foreach( $terms as $term ) {
 								$term_info = term_exists( $term->name, $term->taxonomy );
 
@@ -325,6 +336,18 @@ class Sitewide_Search {
 									'object_id' => $copy_id,
 									'term_taxonomy_id' => $term_info[ 'term_taxonomy_id' ]
 								) );
+
+								if( ! array_key_exists( $term->taxonomy, $recount ) ) {
+									$recount[ $term->taxonomy ] = array();
+								}
+
+								// Add taxonomy terms for counting
+								$recount[ $term->taxonomy ][] = $term_info[ 'term_taxonomy_id' ];
+							}
+
+							// Update term count
+							foreach( $recount as $tax => $ids ) {
+								wp_update_term_count( $ids, $tax );
 							}
 						}
 					}
@@ -557,6 +580,7 @@ class Sitewide_Search {
 				|| ( $this->settings[ 'enable_author' ] && $query->is_author )
 			)
 			&& ! $is_forum
+			&& ! is_admin()
 		) {
 			if( $this->current_blog_id != get_current_blog_id() ) {
 				$this->current_blog_id = get_current_blog_id();
@@ -567,7 +591,7 @@ class Sitewide_Search {
 			// was executed. We'll use it as a after_get_posts-action.
 			// We want to restore the blog id to the current blog so we
 			// don't mess up with the headers and so.
-			add_filter( 'posts_results', array( $this, 'after_set_post_query' ) );
+			add_filter( 'posts_results', array( &$this, 'after_set_post_query' ) );
 
 			return $query;
 		}
@@ -581,13 +605,12 @@ class Sitewide_Search {
 	 * @return array
 	 */
 	public function after_set_post_query( $posts ) {
-		global $wpdb;
-		remove_filter( 'posts_results', array( $this, 'after_set_post_query' ) );
+		remove_filter( 'posts_results', array( &$this, 'after_set_post_query' ) );
 
 		foreach( $posts as $i => $post ) {
 			if( preg_match( '/[^0-9]*([0-9]+),([0-9]+)/', $post->guid, $guid ) ) {
-				$post->ID = $guid[ 2 ];
-				$post->blog_id = $guid[ 1 ];
+				$post->ID = intval( $guid[ 2 ] );
+				$post->blog_id = intval( $guid[ 1 ] );
 				$posts[ $i ] = $post;
 			}
 		}
@@ -599,15 +622,61 @@ class Sitewide_Search {
 	}
 
 	/**
-	 *
+	 * Get original permalink from correct blog
+	 * @param string $permalink
+	 * @param object $post
+	 * return string
 	 */
 	public function get_original_permalink( $permalink, $post ) {
 		if( property_exists( $post, 'blog_id' ) ) {
-			return get_blog_permalink( $post->blog_id, $post->ID );
+			if( intval( $post->blog_id ) != get_current_blog_id() ) {
+				return get_blog_permalink( $post->blog_id, $post->ID );
+			}
 		} elseif( preg_match( '/[^0-9]*([0-9]+),([0-9]+)/', $post->guid, $guid ) ) {
-			return get_blog_permalink( $guid[ 2 ], $post->ID );
-		} else {
-			return $permalink;
+			if( intval( $guid[ 1 ] ) != get_current_blog_id() ) {
+				return get_blog_permalink( $guid[ 1 ], $guid[ 2 ] );
+			}
+		}
+
+		return $permalink;
+	}
+
+	/**
+	 * Switches blog if the post's blog is somewhere else
+	 * @param int $post_id
+	 * @param int $thumb_id
+	 * @param string $size
+	 * return void
+	 */
+	public function switch_blog_for_thumbnail_begin( $post_id, $thumb_id, $size ) {
+		if( $this->settings[ 'archive_blog_id' ] ) {
+			switch_to_blog( $this->settings[ 'archive_blog_id' ] );
+			$this->thumbnai_blog_id = 0;
+			$post = get_post( $post_id );
+
+			if( preg_match( '/[^0-9]*([0-9]+),([0-9]+)/', $post->guid, $guid ) ) {
+				$this->thumbnail_blog_id = $guid[ 1 ];
+			}
+
+			restore_current_blog();
+
+			if( $this->thumbnail_blog_id ) {
+				switch_to_blog( $this->thumbnail_blog_id );
+			}
+		}
+	}
+
+	/**
+	 * Switches blog back to current blog if the post's blog is somewhere else
+	 * @param int $post_id
+	 * @param int $thumb_id
+	 * @param string $size
+	 * return void
+	 */
+	public function switch_blog_for_thumbnail_end( $post_id, $thumb_id, $size ) {
+		if( $this->thumbnail_blog_id ) {
+			restore_current_blog();
+			$this->thumbnail_blog_id = 0;
 		}
 	}
 
