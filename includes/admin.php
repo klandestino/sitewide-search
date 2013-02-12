@@ -328,7 +328,8 @@ class Sitewide_Search_Admin {
 
 				// Only copy posts from public blogs
 				if( get_blog_option( $step[ 'blog' ], 'public', true ) ) {
-					$wpdb->set_blog_id( $step[ 'blog' ] );
+					//$wpdb->set_blog_id( $step[ 'blog' ] );
+					switch_to_blog( $step[ 'blog' ] );
 
 					// If there's no post count defined, get amount of posts to show the
 					// admin of what's left to do.
