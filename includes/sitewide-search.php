@@ -682,6 +682,7 @@ class Sitewide_Search {
 				$this->current_blog_id = 0;
 				restore_current_blog();
 			} elseif( $blog_id ) {
+				restore_current_blog();
 				$this->current_blog_id = get_current_blog_id();
 				switch_to_blog( $blog_id );
 				//$wpdb->set_blog_id( $blog_id );
