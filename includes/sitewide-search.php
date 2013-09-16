@@ -608,12 +608,17 @@ class Sitewide_Search {
 	public function after_set_post_query( $posts ) {
 		remove_filter( 'posts_results', array( &$this, 'after_set_post_query' ) );
 
-		foreach( $posts as $i => $post ) {
-			if( preg_match( '/[^0-9]*([0-9]+),([0-9]+)/', $post->guid, $guid ) ) {
-				$post->ID = intval( $guid[ 2 ] );
-				$post->blog_id = intval( $guid[ 1 ] );
-				$posts[ $i ] = $post;
+		if( count( $posts ) ) {
+			foreach( $posts as $i => $post ) {
+				if( preg_match( '/[^0-9]*([0-9]+),([0-9]+)/', $post->guid, $guid ) ) {
+					$post->ID = intval( $guid[ 2 ] );
+					$post->blog_id = intval( $guid[ 1 ] );
+					$posts[ $i ] = $post;
+				}
 			}
+		} else {
+			remove_action( 'loop_start', array( &$this, 'loop_start' ) );
+			remove_action( 'loop_end', array( &$this, 'loop_end' ) );
 		}
 
 		restore_current_blog();
