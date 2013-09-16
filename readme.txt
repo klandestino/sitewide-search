@@ -3,8 +3,8 @@
 Contributors: spurge, lakrisgubben, alfreddatakillen
 Tags: wordpressmu, sitewide, multisite, search, archive
 Requires at least: WordPress 3.4.2
-Tested up to: WordPress 3.5.1
-Stable tag: 0.9.5
+Tested up to: WordPress 3.6
+Stable tag: 0.9.6
 
 Creates a multisite searching and archive/category/tag/author browsing.
 
@@ -66,6 +66,10 @@ $blog_id.
 Return false if you don't want the post to get deleted.
 
 == Changelog ==
+
+= v0.9.6 =
+
+* Fixed issue with not restoring blog when requesting an empty loop.
 
 = v0.9.5 =
 
