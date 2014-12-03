@@ -554,16 +554,16 @@ class Sitewide_Search {
 		// If bbpress is installed, then local forum listnings
 		// defined as archive etc. will not be overrided.
 		$is_forum = false;
-		$forum_funcs = array( 'bbp_is_forum', 'bbp_is_topic', 'bbp_is_reply' );
 
-		// Loop through bbpress-functions
-		foreach( $forum_funcs as $func ) {
-			if( function_exists( $func ) ) {
-				$is_forum = call_user_func( $func );
-			}
+		global $post;
+
+		if ( function_exists( 'is_bbpress') && ( bbp_is_reply($post->ID) || bbp_is_topic($post->ID) || bbp_is_forum($post->ID) ) ) {
+			$is_forum = true;
 		}
 
-		unset( $forum_funcs );
+		if ( function_exists( 'bp_is_current_action' ) && bp_is_current_action( 'forum' ) ) {
+			$is_forum = true;
+		}
 
 		// Only change query if archive blog is set
 		// and if this query is a search query
