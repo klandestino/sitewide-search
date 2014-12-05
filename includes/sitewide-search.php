@@ -105,7 +105,7 @@ class Sitewide_Search {
 
 			// Handle post queries
 			// Adds post types and from what blog posts will be fetched
-			add_action( 'pre_get_posts', array( &$this, 'set_post_query' ) );
+			add_action( 'pre_get_posts', array( &$this, 'set_post_query' ), 1000 );
 
 			// Correct permalinks if they're fetched from the archive
 			add_filter( 'post_link', array( &$this, 'get_original_permalink' ), 10, 2 );
@@ -575,6 +575,9 @@ class Sitewide_Search {
 				|| ( $this->settings[ 'enable_categories' ] && $query->is_category )
 				|| ( $this->settings[ 'enable_tags' ] && $query->is_tag )
 				|| ( $this->settings[ 'enable_author' ] && $query->is_author )
+				|| ( $query->get('sitewide_search') )
+				|| ( $query->query['sitewide_search'] )
+				|| $query->is_feed
 			)
 			&& ! $is_forum
 			&& ! is_admin()
