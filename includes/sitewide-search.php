@@ -554,6 +554,7 @@ class Sitewide_Search {
 		// If bbpress is installed, then local forum listnings
 		// defined as archive etc. will not be overrided.
 		$is_forum = false;
+		$is_buddypress = false;
 
 		global $post;
 
@@ -561,8 +562,8 @@ class Sitewide_Search {
 			$is_forum = true;
 		}
 
-		if ( function_exists( 'bp_is_current_action' ) && bp_is_current_action( 'forum' ) ) {
-			$is_forum = true;
+		if ( function_exists( 'is_buddypress' ) && is_buddypress() ) {
+			$is_buddypress = true;
 		}
 
 		// Only change query if archive blog is set
@@ -580,6 +581,7 @@ class Sitewide_Search {
 				|| $query->is_feed
 			)
 			&& ! $is_forum
+			&& ! $is_buddypress
 			&& ! is_admin()
 		) {
 			if( $this->current_blog_id != get_current_blog_id() ) {
